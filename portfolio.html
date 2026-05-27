@@ -248,6 +248,39 @@ footer{background:var(--warm-dark);border-top:1px solid rgba(196,84,42,0.2);padd
 #lb-prev,#lb-next{position:fixed;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);border:none;color:#fff;font-size:2.5rem;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:100001;cursor:pointer}
 #lb-prev{left:1rem}#lb-next{right:1rem}
 
+/* Prints on Canvas */
+.prints-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem;max-width:900px;margin:2.5rem auto 0}
+.print-card{background:var(--card-bg);border:1px solid rgba(196,84,42,0.2);border-radius:6px;overflow:hidden;cursor:pointer;transition:transform .3s ease,border-color .3s ease}
+.print-card:hover{transform:translateY(-6px);border-color:var(--ochre)}
+.print-card-img{height:260px;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center}
+.print-card-img img{width:100%;height:100%;object-fit:cover}
+.print-card-body{padding:1rem 1.25rem 1.25rem}
+.print-card-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--cream);margin:0;letter-spacing:.04em}
+.print-card-medium{font-family:'Space Mono',monospace;font-size:.62rem;color:rgba(245,240,232,.5);text-transform:uppercase;margin:.3rem 0 .6rem}
+.print-card-price{font-family:'Space Mono',monospace;font-size:.78rem;color:var(--ochre)}
+.print-card-cta{display:inline-block;margin-top:.85rem;font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--ochre);padding:.5rem 1.1rem;border-radius:2px}
+#printModal{position:fixed;inset:0;background:rgba(10,6,2,.94);z-index:100050;display:none;overflow-y:auto;padding:3rem 1rem}
+#printModal.open{display:block}
+.pm-inner{max-width:880px;margin:0 auto;background:var(--card-bg);border:1px solid rgba(212,146,10,.3);border-radius:8px;overflow:hidden}
+.pm-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+@media(max-width:680px){.pm-grid{grid-template-columns:1fr}}
+.pm-img{background:#111;display:flex;align-items:center;justify-content:center;min-height:320px}
+.pm-img img{width:100%;height:100%;object-fit:contain;max-height:480px}
+.pm-panel{padding:1.75rem}
+.pm-title{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--cream);margin:0;letter-spacing:.04em}
+.pm-medium{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--ochre);text-transform:uppercase;margin:.3rem 0 1rem}
+.pm-desc{font-family:'Space Mono',monospace;font-size:.74rem;color:rgba(245,240,232,.78);line-height:1.9;margin-bottom:1.25rem}
+.pm-label{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(245,240,232,.55);display:block;margin:.9rem 0 .35rem}
+.pm-select,.pm-qty{width:100%;background:#0f0a05;border:1px solid rgba(212,146,10,.3);color:var(--cream);font-family:'Space Mono',monospace;font-size:.78rem;padding:.6rem .7rem;border-radius:3px}
+.pm-rows{margin:1.1rem 0;border-top:1px solid rgba(245,240,232,.12);padding-top:.9rem}
+.pm-row{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:.76rem;color:rgba(245,240,232,.8);padding:.22rem 0}
+.pm-row.total{font-size:1rem;color:var(--ochre);border-top:1px solid rgba(245,240,232,.12);margin-top:.4rem;padding-top:.55rem}
+.pm-paybtns{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.1rem}
+.pm-pay{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:.6rem 1rem;border-radius:3px;text-decoration:none;border:1px solid rgba(245,240,232,.25);color:var(--cream)}
+.pm-pay.primary{background:var(--neon);color:#0a0a0a;border-color:var(--neon);font-weight:bold}
+.pm-note{font-family:'Space Mono',monospace;font-size:.62rem;color:rgba(245,240,232,.5);line-height:1.7;margin-top:.9rem}
+.pm-close{position:absolute;top:1.2rem;right:1.4rem;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:1.6rem;width:44px;height:44px;border-radius:50%;cursor:pointer;z-index:100051}
+
 </style>
 </head>
 <body>
@@ -282,6 +315,7 @@ footer{background:var(--warm-dark);border-top:1px solid rgba(196,84,42,0.2);padd
     <a href="#gallery" onclick="toggleMenu()">Gallery</a>
     <a href="#sketches" onclick="toggleMenu()">Sketches</a>
     <a href="#merch" onclick="toggleMenu()">Merch</a>
+    <a href="#prints" onclick="toggleMenu()">Prints</a>
     <a href="#services" onclick="toggleMenu()">Services</a>
     <a href="#web-design" onclick="toggleMenu()">Web Design</a>
     <a href="#assistant" onclick="toggleMenu()">Assistant</a>
@@ -380,6 +414,13 @@ footer{background:var(--warm-dark);border-top:1px solid rgba(196,84,42,0.2);padd
     <a href="#" class="pay-link" target="_blank">&#9642; Square</a>
     <span class="pay-badge">Venmo</span><span class="pay-badge">Zelle</span><span class="pay-badge">PayPal</span>
   </div>
+</section>
+
+<section id="prints" style="background:var(--warm-dark);border-top:1px solid rgba(196,84,42,0.15)">
+  <p class="section-label fade-up">&#10022; Prints on Canvas</p>
+  <h2 class="section-title fade-up">Original Art <span style="color:var(--ochre)">For Your Wall</span></h2>
+  <p class="fade-up" style="max-width:560px;margin:0.75rem auto 0;text-align:center;font-family:'Space Mono',monospace;font-size:0.8rem;color:rgba(245,240,232,0.7);line-height:1.9">Gallery-wrapped canvas giclée prints — signed by the artist. Tap a piece to choose a size and see your total.</p>
+  <div class="prints-grid fade-up" id="printsGrid"></div>
 </section>
 
 <section id="services">
@@ -874,5 +915,143 @@ document.addEventListener('DOMContentLoaded',function(){
   <img id="lb-img" src="" alt="" onclick="event.stopPropagation()">
   <button id="lb-next" onclick="event.stopPropagation()">&#8250;</button>
 </div>
+
+<div id="printModal" onclick="if(event.target===this)closePrintModal()">
+  <button class="pm-close" onclick="closePrintModal()">&times;</button>
+  <div class="pm-inner">
+    <div class="pm-grid">
+      <div class="pm-img"><img id="pmImg" src="" alt=""></div>
+      <div class="pm-panel">
+        <h3 class="pm-title" id="pmTitle"></h3>
+        <p class="pm-medium" id="pmMedium"></p>
+        <p class="pm-desc" id="pmDesc"></p>
+        <label class="pm-label">Canvas Size</label>
+        <select class="pm-select" id="pmSize" onchange="pmRecalc()"></select>
+        <label class="pm-label">Quantity</label>
+        <input class="pm-qty" id="pmQty" type="number" min="1" value="1" onchange="pmRecalc()" oninput="pmRecalc()">
+        <div class="pm-rows">
+          <div class="pm-row"><span>Print</span><span id="pmSub">$0.00</span></div>
+          <div class="pm-row"><span>MA Sales Tax (6.25%)</span><span id="pmTax">$0.00</span></div>
+          <div class="pm-row"><span>Shipping (USPS)</span><span id="pmShip">$0.00</span></div>
+          <div class="pm-row total"><span>Total</span><span id="pmTotal">$0.00</span></div>
+        </div>
+        <div class="pm-paybtns">
+          <a class="pm-pay primary" id="pmCashapp" href="https://cash.app/$DCRProdpay" target="_blank" rel="noopener">$ Pay with CashApp</a>
+          <a class="pm-pay" href="#contact" onclick="closePrintModal()">Other Payment Options</a>
+        </div>
+        <p class="pm-note" id="pmNote"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var PRINTS = [
+    {
+      id:'usk',
+      title:'Universal Space Kiss',
+      medium:'Giclée on Gallery-Wrapped Canvas',
+      img:'universal-space-kiss.jpg',
+      desc:'A cosmic portrait — a figure meeting the sun across the void, ringed planets and nebulae woven through. Printed with archival inks on gallery-wrapped canvas, ready to hang. Signed by the artist.',
+      sizes:[
+        {label:'12" x 16"',price:65,ship:14},
+        {label:'16" x 20"',price:95,ship:14},
+        {label:'18" x 24"',price:125,ship:19},
+        {label:'24" x 36"',price:175,ship:25}
+      ]
+    },
+    {
+      id:'c617',
+      title:'Code 617',
+      medium:'Giclée on Gallery-Wrapped Canvas',
+      img:'code-617.jpg',
+      desc:'A Boston tribute — the 617 worn proud, the city skyline living inside the portrait. Printed with archival inks on gallery-wrapped canvas, ready to hang. Signed by the artist.',
+      sizes:[
+        {label:'12" x 16"',price:65,ship:14},
+        {label:'16" x 20"',price:95,ship:14},
+        {label:'18" x 24"',price:125,ship:19},
+        {label:'24" x 36"',price:175,ship:25}
+      ]
+    }
+  ];
+  var TAX_RATE = 0.0625;
+  var current = null;
+
+  function money(n){ return '$' + n.toFixed(2); }
+
+  function renderGrid(){
+    var grid = document.getElementById('printsGrid');
+    if(!grid) return;
+    var html = '';
+    for(var i=0;i<PRINTS.length;i++){
+      var p = PRINTS[i];
+      var low = p.sizes[0].price;
+      html += '<div class="print-card" onclick="openPrintModal(\'' + p.id + '\')">'
+            + '<div class="print-card-img"><img src="' + p.img + '" alt="' + p.title + '" loading="lazy"></div>'
+            + '<div class="print-card-body">'
+            + '<p class="print-card-title">' + p.title + '</p>'
+            + '<p class="print-card-medium">' + p.medium + '</p>'
+            + '<span class="print-card-price">From ' + money(low) + '</span><br>'
+            + '<span class="print-card-cta">View &amp; Order &rarr;</span>'
+            + '</div></div>';
+    }
+    grid.innerHTML = html;
+  }
+
+  window.openPrintModal = function(id){
+    for(var i=0;i<PRINTS.length;i++){ if(PRINTS[i].id===id) current = PRINTS[i]; }
+    if(!current) return;
+    document.getElementById('pmImg').src = current.img;
+    document.getElementById('pmImg').alt = current.title;
+    document.getElementById('pmTitle').textContent = current.title;
+    document.getElementById('pmMedium').textContent = current.medium;
+    document.getElementById('pmDesc').textContent = current.desc;
+    var sel = document.getElementById('pmSize');
+    var opts = '';
+    for(var j=0;j<current.sizes.length;j++){
+      var s = current.sizes[j];
+      opts += '<option value="' + j + '">' + s.label + ' \u2014 ' + money(s.price) + '</option>';
+    }
+    sel.innerHTML = opts;
+    sel.value = '0';
+    document.getElementById('pmQty').value = '1';
+    pmRecalc();
+    document.getElementById('printModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closePrintModal = function(){
+    document.getElementById('printModal').classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  window.pmRecalc = function(){
+    if(!current) return;
+    var idx = parseInt(document.getElementById('pmSize').value,10) || 0;
+    var qty = parseInt(document.getElementById('pmQty').value,10);
+    if(!qty || qty < 1){ qty = 1; }
+    var size = current.sizes[idx];
+    var sub = size.price * qty;
+    var tax = sub * TAX_RATE;
+    var ship = size.ship * qty;
+    var total = sub + tax + ship;
+    document.getElementById('pmSub').textContent = money(sub);
+    document.getElementById('pmTax').textContent = money(tax);
+    document.getElementById('pmShip').textContent = money(ship);
+    document.getElementById('pmTotal').textContent = money(total);
+    document.getElementById('pmNote').textContent =
+      'To order: tap Pay with CashApp, send ' + money(total)
+      + ', and in the payment note write "' + current.title + ' \u2014 ' + size.label
+      + ' x' + qty + '" plus your shipping address. Prefer Venmo, Zelle, Square, or PayPal? Use Other Payment Options.';
+  };
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', renderGrid);
+  } else {
+    renderGrid();
+  }
+})();
+</script>
 </body>
 </html>
