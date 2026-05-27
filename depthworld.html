@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DepthWorld — Image to 3D Scene</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Big+Shoulders+Display:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#100b08;
+  --bg-2:#1a120c;
+  --bg-3:#241810;
+  --line:#3a2615;
+  --line-2:#54331c;
+  --ink:#f2e8d8;
+  --ink-dim:#a08a6e;
+  --ink-faint:#6a533a;
+  --orange:#e07a3a;
+  --orange-2:#f4a261;
+  --gold:#d49a1f;
+  --cyan:#22cfde;
+  --red:#d64545;
+  --green:#7aaf5b;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:13px}
+button,input{font-family:inherit;font-size:inherit;color:inherit;background:transparent;border:none;outline:none}
+button{cursor:pointer}
+.hidden{display:none!important}
+
+canvas#scene{position:fixed;inset:0;display:block;z-index:1}
+
+/* TOP BRAND BAR */
+#topbar{
+  position:fixed;top:0;left:0;right:0;height:50px;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;
+  background:linear-gradient(180deg,rgba(16,11,8,.95) 0%,rgba(16,11,8,.7) 70%,transparent 100%);
+  pointer-events:none;
+}
+#topbar > *{pointer-events:auto}
+.brand{display:flex;align-items:baseline;gap:8px}
+.brand-mark{
+  font-family:'Big Shoulders Display',Impact,sans-serif;
+  font-weight:900;font-size:24px;letter-spacing:1px;line-height:1;
+  background:linear-gradient(135deg,var(--orange) 0%,var(--gold) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.brand-sub{font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:2px}
+
+.topbar-actions{display:flex;gap:8px}
+.tb-btn{
+  padding:6px 12px;border:1px solid var(--line);background:rgba(36,24,16,.85);
+  font-size:10px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:1.5px;
+  transition:all .15s;
+}
+.tb-btn:hover{border-color:var(--orange);color:var(--orange)}
+.tb-btn.primary{background:var(--orange);color:var(--bg);border-color:var(--orange);font-weight:600}
+.tb-btn.primary:hover{background:var(--orange-2);border-color:var(--orange-2)}
+
+/* LEFT PANEL */
+#leftpanel{
+  position:fixed;left:18px;top:74px;z-index:10;width:240px;
+  max-height:calc(100vh - 110px);overflow-y:auto;
+  background:rgba(26,18,12,.92);border:1px solid var(--line);
+  padding:14px;backdrop-filter:blur(6px);
+}
+#leftpanel::-webkit-scrollbar{width:6px}
+#leftpanel::-webkit-scrollbar-track{background:transparent}
+#leftpanel::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:3px}
+.panel-title{font-size:9px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;font-weight:500}
+.spawn-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
+.spawn-btn{
+  padding:8px 6px;background:var(--bg-3);border:1px solid var(--line-2);
+  color:var(--ink);font-size:10px;text-transform:uppercase;letter-spacing:1px;
+  transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.spawn-btn:hover{border-color:var(--orange);color:var(--orange)}
+.spawn-btn .shape{width:18px;height:18px;display:inline-block}
+
+.slider-row{margin-bottom:10px}
+.slider-row label{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px}
+.slider-row label span{color:var(--gold);font-weight:600}
+.slider-row input[type=range]{width:100%;accent-color:var(--orange)}
+
+.divider{height:1px;background:var(--line);margin:12px 0}
+
+.panel-action{
+  width:100%;padding:8px;background:var(--bg-3);border:1px solid var(--line-2);
+  font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--ink-dim);
+  transition:all .15s;margin-bottom:4px;
+}
+.panel-action:hover{border-color:var(--orange);color:var(--orange)}
+.panel-action.danger:hover{border-color:var(--red);color:var(--red)}
+.panel-action.gold{border-color:var(--gold);color:var(--gold)}
+.panel-action.gold:hover{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+.panel-action.cyan{border-color:var(--cyan);color:var(--cyan)}
+.panel-action.cyan:hover{background:var(--cyan);color:var(--bg);border-color:var(--cyan)}
+
+/* PAINT MODE */
+.paint-toggle{
+  display:flex;align-items:center;gap:8px;width:100%;
+  padding:8px 10px;background:var(--bg-3);border:1px solid var(--line-2);
+  color:var(--ink-dim);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;
+  margin-bottom:8px;transition:all .15s;
+}
+.paint-toggle:hover{border-color:var(--orange);color:var(--orange)}
+.paint-toggle.active{background:var(--orange);color:var(--bg);border-color:var(--orange);font-weight:600}
+.paint-toggle .pt-dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0}
+.paint-swatches{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.paint-swatch{
+  width:22px;height:22px;border-radius:50%;cursor:pointer;
+  border:2px solid var(--line);transition:all .12s;
+}
+.paint-swatch:hover{transform:scale(1.1)}
+.paint-swatch.active{border-color:var(--ink);box-shadow:0 0 0 1px var(--bg)}
+.paint-size-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:1.5px}
+.paint-size-row input{flex:1;accent-color:var(--orange)}
+
+/* THUMBNAIL */
+#thumb-wrap{
+  position:fixed;top:74px;right:18px;z-index:10;width:180px;
+  background:rgba(26,18,12,.92);border:1px solid var(--line);padding:8px;
+  backdrop-filter:blur(6px);
+}
+#thumb-label{font-size:9px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
+#thumb{width:100%;display:block;border:1px solid var(--line)}
+
+/* HINT BOX */
+#hint{
+  position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:10;
+  background:rgba(26,18,12,.92);border:1px solid var(--line-2);
+  padding:8px 16px;font-size:11px;color:var(--ink-dim);
+  text-transform:uppercase;letter-spacing:1.5px;backdrop-filter:blur(6px);
+  max-width:90vw;text-align:center;
+}
+#hint kbd{background:var(--bg);border:1px solid var(--line-2);padding:1px 6px;font-family:inherit;color:var(--gold)}
+
+/* LOADER OVERLAY */
+#loader{
+  position:fixed;inset:0;z-index:100;
+  background:rgba(16,11,8,.92);backdrop-filter:blur(8px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px;
+}
+.loader-title{
+  font-family:'Big Shoulders Display',Impact,sans-serif;
+  font-weight:900;font-size:48px;letter-spacing:2px;line-height:1;margin-bottom:8px;
+  background:linear-gradient(135deg,var(--orange) 0%,var(--gold) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.loader-sub{font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:2px;margin-bottom:32px}
+.loader-text{font-size:13px;color:var(--ink-dim);margin-bottom:18px;text-align:center;max-width:500px;line-height:1.6}
+.loader-bar{width:340px;max-width:80vw;height:4px;background:var(--bg-3);border:1px solid var(--line);overflow:hidden}
+.loader-bar-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--gold));width:0%;transition:width .25s ease}
+.loader-hint{font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:2px;margin-top:18px}
+.loader-error{color:var(--red);font-size:12px;max-width:500px;text-align:center;margin-top:14px;line-height:1.5}
+
+/* WELCOME SCREEN (initial) */
+#welcome{
+  position:fixed;inset:0;z-index:50;
+  background:radial-gradient(ellipse at center,rgba(36,24,16,.95) 0%,rgba(16,11,8,.98) 70%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px;
+}
+.welcome-title{
+  font-family:'Big Shoulders Display',Impact,sans-serif;
+  font-weight:900;font-size:72px;letter-spacing:2px;line-height:.95;margin-bottom:10px;
+  background:linear-gradient(135deg,var(--orange) 0%,var(--gold) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.welcome-sub{font-size:13px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:3px;margin-bottom:8px}
+.welcome-tag{font-size:12px;color:var(--ink-faint);max-width:520px;text-align:center;line-height:1.6;margin-bottom:32px}
+.welcome-btn{
+  padding:14px 28px;background:var(--orange);color:var(--bg);
+  font-size:12px;text-transform:uppercase;letter-spacing:2px;font-weight:700;
+  border:none;transition:all .15s;
+}
+.welcome-btn:hover{background:var(--orange-2)}
+.welcome-info{
+  margin-top:32px;display:flex;gap:18px;flex-wrap:wrap;justify-content:center;
+  max-width:600px;
+}
+.welcome-info-item{
+  font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:1.5px;
+  display:flex;align-items:center;gap:6px;
+}
+.welcome-info-item::before{content:'◇';color:var(--orange)}
+
+@media (max-width:760px){
+  .welcome-title{font-size:48px}
+  #leftpanel{width:200px}
+  #thumb-wrap{width:120px}
+}
+</style>
+</head>
+<body>
+
+<canvas id="scene"></canvas>
+
+<!-- WELCOME -->
+<div id="welcome">
+  <div class="welcome-title">DEPTH<span style="color:var(--ink)">WORLD</span></div>
+  <div class="welcome-sub">Image → 3D Scene · Physics</div>
+  <div class="welcome-tag">Upload any image. A depth model runs in your browser to estimate the 3D shape, then it becomes a textured terrain you can drop physics objects onto.</div>
+  <button class="welcome-btn" id="welcome-start">→  Begin</button>
+  <div class="welcome-info">
+    <div class="welcome-info-item">100% in-browser</div>
+    <div class="welcome-info-item">No API key</div>
+    <div class="welcome-info-item">~50MB model (first load)</div>
+    <div class="welcome-info-item">Best on lit scenes with depth</div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div id="topbar" class="hidden">
+  <div class="brand">
+    <span class="brand-mark">DEPTHWORLD</span>
+    <span class="brand-sub">Image → 3D · Physics</span>
+  </div>
+  <div class="topbar-actions">
+    <button class="tb-btn primary" id="upload-btn">↑  Upload Image</button>
+  </div>
+</div>
+
+<!-- LEFT PANEL -->
+<div id="leftpanel" class="hidden">
+  <div class="panel-title">✦ Spawn Object</div>
+  <div class="spawn-grid">
+    <button class="spawn-btn" data-spawn="box">
+      <svg class="shape" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="12" height="12"/></svg>
+      Box
+    </button>
+    <button class="spawn-btn" data-spawn="sphere">
+      <svg class="shape" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="6"/></svg>
+      Sphere
+    </button>
+    <button class="spawn-btn" data-spawn="barrel">
+      <svg class="shape" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="9" cy="4" rx="5" ry="1.5"/><line x1="4" y1="4" x2="4" y2="14"/><line x1="14" y1="4" x2="14" y2="14"/><ellipse cx="9" cy="14" rx="5" ry="1.5"/></svg>
+      Barrel
+    </button>
+    <button class="spawn-btn" data-spawn="rain">
+      <svg class="shape" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="1.5"/><circle cx="12" cy="6" r="1.5"/><circle cx="7" cy="10" r="1.5"/><circle cx="13" cy="13" r="1.5"/></svg>
+      Rain 10
+    </button>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="panel-title">✦ Terrain</div>
+  <div class="slider-row">
+    <label>Depth Intensity <span id="displace-val">2.0</span></label>
+    <input type="range" id="displace" min="0.2" max="5" step="0.1" value="2">
+  </div>
+  <div class="slider-row">
+    <label>Mesh Detail <span id="seg-val">128</span></label>
+    <input type="range" id="segments" min="32" max="256" step="32" value="128">
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="panel-title">✦ Paint Mode</div>
+  <button class="paint-toggle" id="paint-toggle">
+    <span class="pt-dot"></span>
+    <span id="paint-toggle-label">Paint OFF</span>
+  </button>
+  <div class="paint-swatches" id="paint-swatches">
+    <div class="paint-swatch active" data-color="#e07a3a" style="background:#e07a3a"></div>
+    <div class="paint-swatch" data-color="#d49a1f" style="background:#d49a1f"></div>
+    <div class="paint-swatch" data-color="#22cfde" style="background:#22cfde"></div>
+    <div class="paint-swatch" data-color="#d64545" style="background:#d64545"></div>
+    <div class="paint-swatch" data-color="#7aaf5b" style="background:#7aaf5b"></div>
+    <div class="paint-swatch" data-color="#f2e8d8" style="background:#f2e8d8"></div>
+    <div class="paint-swatch" data-color="#1a120c" style="background:#1a120c;border-color:var(--line-2)"></div>
+  </div>
+  <div class="paint-size-row">
+    <span>Size</span>
+    <input type="range" id="paint-size" min="0.05" max="0.5" step="0.01" value="0.18">
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="panel-title">✦ Cinematic</div>
+  <button class="panel-action cyan" id="fly-btn">▶  Fly Through</button>
+
+  <div class="divider"></div>
+
+  <div class="panel-title">✦ Actions</div>
+  <button class="panel-action" id="reset-cam">Reset Camera</button>
+  <button class="panel-action danger" id="clear-objects">Clear Objects</button>
+  <button class="panel-action danger" id="clear-paint">Clear Paint</button>
+  <button class="panel-action gold" id="export-gltf">↓  Export .glb (for Blender)</button>
+</div>
+
+<!-- THUMB -->
+<div id="thumb-wrap" class="hidden">
+  <div id="thumb-label">✦ Source</div>
+  <img id="thumb" alt="">
+</div>
+
+<!-- HINT -->
+<div id="hint" class="hidden">
+  <kbd>LMB</kbd> orbit  ·  <kbd>RMB</kbd> pan  ·  <kbd>scroll</kbd> zoom
+</div>
+
+<!-- LOADER -->
+<div id="loader" class="hidden">
+  <div class="loader-title">DEPTHWORLD</div>
+  <div class="loader-sub">Initializing</div>
+  <div class="loader-text" id="loader-text">Loading depth estimation model — about 50MB. Future loads will use the cached version.</div>
+  <div class="loader-bar"><div class="loader-bar-fill" id="loader-fill"></div></div>
+  <div class="loader-hint" id="loader-hint">First time can take 30-90 seconds</div>
+  <div class="loader-error hidden" id="loader-error"></div>
+</div>
+
+<input type="file" id="file-input" accept="image/*" hidden>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+    "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/+esm",
+    "@huggingface/transformers": "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0/+esm"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import * as CANNON from 'cannon-es';
+import { pipeline, env } from '@huggingface/transformers';
+
+// Configure transformers to allow remote model loading & cache to IndexedDB
+env.allowLocalModels = false;
+env.useBrowserCache = true;
+
+// ============================== STATE ==============================
+const state = {
+  depthEstimator: null,
+  modelReady: false,
+  lastImage: null,        // HTMLImageElement
+  lastDepth: null,        // { data, width, height, channels }
+  terrainMesh: null,
+  terrainBody: null,
+  dynamicObjects: [],     // [{mesh, body}]
+  displaceAmount: 2.0,
+  meshSegments: 128,
+  // Paint mode
+  paintMode: false,
+  paintColor: '#e07a3a',
+  paintSize: 0.18,
+  paintSplats: [],
+  paintLastPoint: null,
+  // Cinematic
+  isFlying: false,
+  flyStart: 0,
+  flyDuration: 9000,
+  flyCurve: null,
+  flySaved: null,
+};
+
+// ============================== THREE.JS ==============================
+const canvas = document.getElementById('scene');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x100b08);
+scene.fog = new THREE.Fog(0x100b08, 20, 60);
+
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 200);
+camera.position.set(0, 7, 13);
+
+const controls = new OrbitControls(camera, canvas);
+controls.target.set(0, 0, 0);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 3;
+controls.maxDistance = 40;
+controls.maxPolarAngle = Math.PI * 0.85;
+
+// Lighting
+scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+
+const sun = new THREE.DirectionalLight(0xffeecc, 1.6);
+sun.position.set(8, 18, 10);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+const sd = sun.shadow.camera;
+sd.left = -12; sd.right = 12; sd.top = 12; sd.bottom = -12; sd.near = 0.5; sd.far = 50;
+sun.shadow.bias = -0.0005;
+scene.add(sun);
+
+const rim = new THREE.DirectionalLight(0x6688aa, 0.35);
+rim.position.set(-10, 4, -8);
+scene.add(rim);
+
+// Ground catch plane (well below terrain)
+const groundGeo = new THREE.PlaneGeometry(80, 80);
+const groundMat = new THREE.MeshStandardMaterial({ color: 0x1d130a, roughness: 1.0, metalness: 0 });
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = -8;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// Subtle grid
+const grid = new THREE.GridHelper(60, 30, 0x3a2615, 0x241810);
+grid.position.y = -7.99;
+scene.add(grid);
+
+// Initial placeholder mesh (so the scene isn't empty before upload)
+const placeholderGeo = new THREE.BoxGeometry(0.001, 0.001, 0.001);
+const placeholder = new THREE.Mesh(placeholderGeo, new THREE.MeshBasicMaterial({ visible: false }));
+scene.add(placeholder);
+
+// ============================== PHYSICS ==============================
+const world = new CANNON.World({ gravity: new CANNON.Vec3(0, -14, 0) });
+world.broadphase = new CANNON.SAPBroadphase(world);
+world.allowSleep = true;
+world.defaultContactMaterial.friction = 0.5;
+world.defaultContactMaterial.restitution = 0.25;
+
+const groundBody = new CANNON.Body({ mass: 0, shape: new CANNON.Plane() });
+groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+groundBody.position.y = -8;
+world.addBody(groundBody);
+
+// ============================== ANIMATION LOOP ==============================
+const clock = new THREE.Clock();
+const tmpV = new THREE.Vector3();
+
+function animate() {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  world.step(1 / 60, dt, 5);
+
+  for (const obj of state.dynamicObjects) {
+    obj.mesh.position.set(obj.body.position.x, obj.body.position.y, obj.body.position.z);
+    obj.mesh.quaternion.set(obj.body.quaternion.x, obj.body.quaternion.y, obj.body.quaternion.z, obj.body.quaternion.w);
+  }
+
+  if (state.isFlying) updateFlyThrough();
+
+  controls.update();
+  renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+}
+
+function resize() {
+  const w = window.innerWidth, h = window.innerHeight;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+resize();
+animate();
+
+// ============================== MODEL LOADING ==============================
+async function loadModel() {
+  showLoader('Loading depth estimation model — about 50MB. Future loads use the cached version.', 0);
+  try {
+    state.depthEstimator = await pipeline('depth-estimation', 'Xenova/depth-anything-small-hf', {
+      progress_callback: (data) => {
+        if (data.status === 'progress' && typeof data.progress === 'number') {
+          const pct = Math.round(data.progress);
+          showLoader(`Loading model — ${data.file || 'weights'}`, pct);
+        } else if (data.status === 'ready') {
+          showLoader('Model ready.', 100);
+        }
+      }
+    });
+    state.modelReady = true;
+    hideLoader();
+    document.getElementById('topbar').classList.remove('hidden');
+    showHint('Click <kbd>Upload Image</kbd> to begin.');
+  } catch (e) {
+    showLoaderError(`Could not load model: ${e?.message || e}. Make sure you're online for the first load. CORS/CDN issues can also cause this when opening the file directly — try hosting on GitHub Pages.`);
+  }
+}
+
+// ============================== DEPTH ESTIMATION & MESH BUILD ==============================
+async function processImage(file) {
+  if (!state.modelReady) { showHint('Model not loaded yet'); return; }
+
+  cancelFlyThrough();
+  showLoader('Reading image...', 5);
+
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+
+  try {
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = () => reject(new Error('Image failed to load'));
+      img.src = url;
+    });
+  } catch (e) {
+    showLoaderError(e.message);
+    return;
+  }
+
+  // Show source thumbnail
+  document.getElementById('thumb').src = url;
+  document.getElementById('thumb-wrap').classList.remove('hidden');
+
+  showLoader('Estimating depth — this takes 1-5 seconds on a modern computer.', 50);
+
+  let depthRaw;
+  try {
+    const output = await state.depthEstimator(url);
+    depthRaw = output.depth; // RawImage: { data, width, height, channels }
+  } catch (e) {
+    showLoaderError(`Depth estimation failed: ${e?.message || e}`);
+    return;
+  }
+
+  state.lastImage = img;
+  state.lastDepth = depthRaw;
+
+  showLoader('Building 3D mesh and physics...', 90);
+
+  buildTerrain();
+
+  hideLoader();
+  document.getElementById('leftpanel').classList.remove('hidden');
+  showHint('Drop objects with the left panel. <kbd>LMB</kbd> orbit · <kbd>scroll</kbd> zoom · <kbd>RMB</kbd> pan');
+}
+
+function buildTerrain() {
+  if (!state.lastImage || !state.lastDepth) return;
+
+  // Dispose previous
+  if (state.terrainMesh) {
+    scene.remove(state.terrainMesh);
+    state.terrainMesh.geometry.dispose();
+    if (state.terrainMesh.material.map) state.terrainMesh.material.map.dispose();
+    state.terrainMesh.material.dispose();
+    state.terrainMesh = null;
+  }
+  if (state.terrainBody) {
+    world.removeBody(state.terrainBody);
+    state.terrainBody = null;
+  }
+
+  const img = state.lastImage;
+  const depth = state.lastDepth;
+
+  const srcAspect = img.width / img.height;
+  const planeW = 12;
+  const planeH = planeW / srcAspect;
+
+  const segX = state.meshSegments;
+  const segY = Math.max(16, Math.round(state.meshSegments / srcAspect));
+
+  // Create plane oriented horizontally (XZ plane, Y up)
+  const geometry = new THREE.PlaneGeometry(planeW, planeH, segX, segY);
+  geometry.rotateX(-Math.PI / 2);
+
+  // Sample depth at each vertex
+  const depthData = depth.data;       // Uint8ClampedArray or Uint8Array
+  const depthW = depth.width;
+  const depthH = depth.height;
+  const channels = depth.channels || 1;
+
+  function sampleDepthBilinear(u, v) {
+    // u, v in 0..1, with (0,0) = top-left of source image
+    const fx = u * (depthW - 1);
+    const fy = v * (depthH - 1);
+    const x0 = Math.floor(fx), y0 = Math.floor(fy);
+    const x1 = Math.min(depthW - 1, x0 + 1), y1 = Math.min(depthH - 1, y0 + 1);
+    const dx = fx - x0, dy = fy - y0;
+    const i00 = (y0 * depthW + x0) * channels;
+    const i10 = (y0 * depthW + x1) * channels;
+    const i01 = (y1 * depthW + x0) * channels;
+    const i11 = (y1 * depthW + x1) * channels;
+    const v00 = depthData[i00] / 255;
+    const v10 = depthData[i10] / 255;
+    const v01 = depthData[i01] / 255;
+    const v11 = depthData[i11] / 255;
+    return v00 * (1 - dx) * (1 - dy) + v10 * dx * (1 - dy) + v01 * (1 - dx) * dy + v11 * dx * dy;
+  }
+
+  const positions = geometry.attributes.position.array;
+  for (let i = 0; i < positions.length; i += 3) {
+    const x = positions[i];
+    const z = positions[i + 2];
+    const u = (x + planeW / 2) / planeW;          // 0..1 across width
+    const v = 1 - (z + planeH / 2) / planeH;      // 0..1 with top=0 to match image
+    const d = sampleDepthBilinear(u, v);
+    // Depth Anything outputs: brighter = closer. Center around 0.
+    positions[i + 1] = (d - 0.5) * state.displaceAmount;
+  }
+  geometry.computeVertexNormals();
+  geometry.attributes.position.needsUpdate = true;
+
+  // Texture from source image
+  const texture = new THREE.Texture(img);
+  texture.needsUpdate = true;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.generateMipmaps = true;
+
+  const material = new THREE.MeshStandardMaterial({
+    map: texture,
+    roughness: 0.85,
+    metalness: 0.0,
+    side: THREE.DoubleSide,
+  });
+
+  state.terrainMesh = new THREE.Mesh(geometry, material);
+  state.terrainMesh.receiveShadow = true;
+  state.terrainMesh.castShadow = true;
+  scene.add(state.terrainMesh);
+
+  // Physics — build a Trimesh from the same geometry
+  // Cannon Trimesh wants flat arrays of vertices and indices
+  const vertices = new Float32Array(positions);
+  let indices;
+  if (geometry.index) {
+    indices = new Uint32Array(geometry.index.array);
+  } else {
+    // Non-indexed (shouldn't happen with PlaneGeometry but fallback)
+    indices = new Uint32Array(positions.length / 3);
+    for (let i = 0; i < indices.length; i++) indices[i] = i;
+  }
+
+  const trimesh = new CANNON.Trimesh(vertices, indices);
+  state.terrainBody = new CANNON.Body({ mass: 0, material: new CANNON.Material({ friction: 0.6, restitution: 0.3 }) });
+  state.terrainBody.addShape(trimesh);
+  world.addBody(state.terrainBody);
+
+  // Frame camera to fit the new terrain nicely
+  const fitDist = Math.max(planeW, planeH) * 1.1;
+  controls.target.set(0, 0, 0);
+  if (controls.getDistance() < fitDist) {
+    camera.position.set(0, fitDist * 0.55, fitDist * 0.95);
+  }
+  controls.update();
+}
+
+// ============================== SPAWN OBJECTS ==============================
+function spawnObject(type) {
+  if (!state.terrainMesh && type !== 'rain') {
+    showHint('Upload an image first');
+    return;
+  }
+
+  const sizes = {
+    box: 0.45,
+    sphere: 0.32,
+    barrel: { r: 0.32, h: 0.7 },
+  };
+
+  // Spawn position: roughly above the visible terrain, with random scatter
+  const planeW = 12;
+  const aspect = state.lastImage ? state.lastImage.width / state.lastImage.height : 1;
+  const planeH = planeW / aspect;
+  const sx = (Math.random() - 0.5) * planeW * 0.5;
+  const sz = (Math.random() - 0.5) * planeH * 0.5;
+  const sy = 6 + Math.random() * 2;
+
+  let mesh, body;
+
+  if (type === 'box') {
+    const s = sizes.box;
+    mesh = new THREE.Mesh(
+      new THREE.BoxGeometry(s, s, s),
+      new THREE.MeshStandardMaterial({ color: 0xe07a3a, roughness: 0.55, metalness: 0.1 })
+    );
+    body = new CANNON.Body({
+      mass: 1.2,
+      shape: new CANNON.Box(new CANNON.Vec3(s / 2, s / 2, s / 2)),
+    });
+  } else if (type === 'sphere') {
+    const r = sizes.sphere;
+    mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(r, 24, 18),
+      new THREE.MeshStandardMaterial({ color: 0xd49a1f, roughness: 0.35, metalness: 0.3 })
+    );
+    body = new CANNON.Body({
+      mass: 1.0,
+      shape: new CANNON.Sphere(r),
+    });
+  } else if (type === 'barrel') {
+    const { r, h } = sizes.barrel;
+    mesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(r, r, h, 20),
+      new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.85, metalness: 0.05 })
+    );
+    // Cannon's Cylinder is along Y by default — matches Three.js
+    body = new CANNON.Body({
+      mass: 2.0,
+      shape: new CANNON.Cylinder(r, r, h, 16),
+    });
+  } else if (type === 'rain') {
+    // Spawn 10 random objects
+    for (let i = 0; i < 10; i++) {
+      setTimeout(() => spawnObject(['box', 'sphere', 'barrel'][Math.floor(Math.random() * 3)]), i * 80);
+    }
+    return;
+  }
+
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+
+  body.position.set(sx, sy, sz);
+  body.angularVelocity.set((Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3);
+  body.linearDamping = 0.05;
+  body.angularDamping = 0.08;
+
+  scene.add(mesh);
+  world.addBody(body);
+  state.dynamicObjects.push({ mesh, body });
+}
+
+function clearDynamicObjects() {
+  for (const obj of state.dynamicObjects) {
+    scene.remove(obj.mesh);
+    obj.mesh.geometry.dispose();
+    obj.mesh.material.dispose();
+    world.removeBody(obj.body);
+  }
+  state.dynamicObjects.length = 0;
+}
+
+// ============================== PAINT MODE ==============================
+const raycaster = new THREE.Raycaster();
+const ndc = new THREE.Vector2();
+let isPainting = false;
+
+// Soft circular alpha texture for splats
+function makeSplatAlphaTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const ctx = c.getContext('2d');
+  const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  grad.addColorStop(0, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.5, 'rgba(255,255,255,0.9)');
+  grad.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 64, 64);
+  const tex = new THREE.CanvasTexture(c);
+  tex.needsUpdate = true;
+  return tex;
+}
+const splatAlphaTex = makeSplatAlphaTexture();
+
+function setPaintMode(active) {
+  state.paintMode = active;
+  const btn = document.getElementById('paint-toggle');
+  const label = document.getElementById('paint-toggle-label');
+  if (active) {
+    btn.classList.add('active');
+    label.textContent = 'Paint ON';
+    controls.mouseButtons.LEFT = -1; // disable orbit on LMB
+    canvas.style.cursor = 'crosshair';
+  } else {
+    btn.classList.remove('active');
+    label.textContent = 'Paint OFF';
+    controls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+    canvas.style.cursor = '';
+  }
+}
+
+function tryPaintAt(clientX, clientY) {
+  if (!state.terrainMesh) return;
+  const rect = canvas.getBoundingClientRect();
+  ndc.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+  ndc.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(ndc, camera);
+  const hits = raycaster.intersectObject(state.terrainMesh);
+  if (hits.length === 0) return;
+  const hit = hits[0];
+
+  // Throttle continuous painting by minimum distance
+  if (state.paintLastPoint && hit.point.distanceTo(state.paintLastPoint) < state.paintSize * 0.5) return;
+  state.paintLastPoint = hit.point.clone();
+
+  // Surface normal in world space
+  const normal = hit.face.normal.clone().transformDirection(state.terrainMesh.matrixWorld).normalize();
+
+  const radius = state.paintSize * (0.7 + Math.random() * 0.6);
+  const geo = new THREE.CircleGeometry(radius, 18);
+  const mat = new THREE.MeshBasicMaterial({
+    color: new THREE.Color(state.paintColor),
+    transparent: true,
+    opacity: 0.92,
+    alphaMap: splatAlphaTex,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+  });
+  const splat = new THREE.Mesh(geo, mat);
+  splat.position.copy(hit.point).add(normal.clone().multiplyScalar(0.015));
+  // Orient splat to surface normal
+  splat.lookAt(hit.point.clone().add(normal));
+  splat.renderOrder = 1;
+  scene.add(splat);
+  state.paintSplats.push(splat);
+}
+
+canvas.addEventListener('pointerdown', (e) => {
+  if (!state.paintMode || e.button !== 0) return;
+  isPainting = true;
+  state.paintLastPoint = null;
+  tryPaintAt(e.clientX, e.clientY);
+});
+canvas.addEventListener('pointermove', (e) => {
+  if (!state.paintMode || !isPainting) return;
+  tryPaintAt(e.clientX, e.clientY);
+});
+window.addEventListener('pointerup', () => { isPainting = false; });
+
+function clearPaintSplats() {
+  for (const s of state.paintSplats) {
+    scene.remove(s);
+    s.geometry.dispose();
+    s.material.dispose();
+  }
+  state.paintSplats.length = 0;
+}
+
+// ============================== CINEMATIC FLY-THROUGH ==============================
+function buildFlyCurve() {
+  const aspect = state.lastImage ? state.lastImage.width / state.lastImage.height : 1;
+  const planeW = 12;
+  const planeH = planeW / aspect;
+  const r = Math.max(planeW, planeH);
+  // Closed loop of waypoints around the terrain at varying heights
+  const points = [
+    new THREE.Vector3(0,       7, r * 1.1),
+    new THREE.Vector3(r * 0.7, 5, r * 0.6),
+    new THREE.Vector3(r * 0.9, 2, 0),
+    new THREE.Vector3(r * 0.5, 1, -r * 0.5),
+    new THREE.Vector3(0,       3, -r * 1.0),
+    new THREE.Vector3(-r * 0.6, 5, -r * 0.4),
+    new THREE.Vector3(-r * 0.9, 4, r * 0.3),
+    new THREE.Vector3(-r * 0.3, 8, r * 0.9),
+    new THREE.Vector3(0,       7, r * 1.1),
+  ];
+  return new THREE.CatmullRomCurve3(points, false, 'catmullrom', 0.4);
+}
+
+function startFlyThrough() {
+  if (!state.terrainMesh) { showHint('Upload an image first'); return; }
+  if (state.isFlying) return;
+  state.flyCurve = buildFlyCurve();
+  state.flySaved = {
+    pos: camera.position.clone(),
+    target: controls.target.clone(),
+  };
+  state.flyStart = performance.now();
+  state.isFlying = true;
+  controls.enabled = false;
+  showHint('Cinematic running — press <kbd>ESC</kbd> to cancel');
+}
+
+function cancelFlyThrough() {
+  if (!state.isFlying) return;
+  state.isFlying = false;
+  if (state.flySaved) {
+    camera.position.copy(state.flySaved.pos);
+    controls.target.copy(state.flySaved.target);
+  }
+  controls.enabled = true;
+  controls.update();
+}
+
+function updateFlyThrough() {
+  const elapsed = performance.now() - state.flyStart;
+  const t = Math.min(elapsed / state.flyDuration, 1);
+  // Smoothstep ease in/out
+  const eT = t * t * (3 - 2 * t);
+  const pos = state.flyCurve.getPoint(eT);
+  camera.position.copy(pos);
+  camera.lookAt(0, 0, 0);
+
+  if (t >= 1) {
+    state.isFlying = false;
+    if (state.flySaved) {
+      camera.position.copy(state.flySaved.pos);
+      controls.target.copy(state.flySaved.target);
+    }
+    controls.enabled = true;
+    controls.update();
+    showHint('Cinematic complete.');
+  }
+}
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && state.isFlying) cancelFlyThrough();
+});
+
+// ============================== GLTF EXPORT ==============================
+function exportGLTF() {
+  if (!state.terrainMesh) { showHint('Upload an image first'); return; }
+
+  showHint('Building .glb export...');
+
+  // Build a clean export group with current world transforms baked in
+  const exportGroup = new THREE.Group();
+  exportGroup.name = 'DepthWorld_Scene';
+
+  // Terrain
+  const terrainClone = state.terrainMesh.clone();
+  terrainClone.name = 'Terrain';
+  exportGroup.add(terrainClone);
+
+  // Dynamic objects (at their current rested positions)
+  for (let i = 0; i < state.dynamicObjects.length; i++) {
+    const o = state.dynamicObjects[i];
+    const m = o.mesh.clone();
+    m.name = `Object_${i}`;
+    m.position.copy(o.mesh.position);
+    m.quaternion.copy(o.mesh.quaternion);
+    exportGroup.add(m);
+  }
+
+  // Paint splats
+  for (let i = 0; i < state.paintSplats.length; i++) {
+    const s = state.paintSplats[i].clone();
+    s.name = `Paint_${i}`;
+    exportGroup.add(s);
+  }
+
+  const exporter = new GLTFExporter();
+  exporter.parse(
+    exportGroup,
+    (result) => {
+      // result is ArrayBuffer when binary: true
+      const blob = new Blob([result], { type: 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+      a.href = url;
+      a.download = `depthworld-scene-${stamp}.glb`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showHint('Downloaded .glb — drag it into Blender to import.');
+    },
+    (error) => {
+      console.error('Export error:', error);
+      showHint('Export failed: ' + (error?.message || error));
+    },
+    {
+      binary: true,
+      embedImages: true,
+      onlyVisible: true,
+    }
+  );
+}
+
+// ============================== UI ==============================
+function showLoader(text, pct) {
+  document.getElementById('loader').classList.remove('hidden');
+  document.getElementById('loader-text').textContent = text;
+  document.getElementById('loader-fill').style.width = (pct ?? 0) + '%';
+  document.getElementById('loader-error').classList.add('hidden');
+}
+function showLoaderError(msg) {
+  document.getElementById('loader').classList.remove('hidden');
+  const e = document.getElementById('loader-error');
+  e.textContent = msg;
+  e.classList.remove('hidden');
+}
+function hideLoader() {
+  document.getElementById('loader').classList.add('hidden');
+}
+function showHint(html) {
+  const el = document.getElementById('hint');
+  el.innerHTML = html;
+  el.classList.remove('hidden');
+}
+
+// Welcome → start
+document.getElementById('welcome-start').onclick = async () => {
+  document.getElementById('welcome').classList.add('hidden');
+  await loadModel();
+};
+
+// Upload
+document.getElementById('upload-btn').onclick = () => document.getElementById('file-input').click();
+document.getElementById('file-input').onchange = (e) => {
+  const file = e.target.files[0];
+  if (file) processImage(file);
+  e.target.value = ''; // allow re-selecting same file
+};
+
+// Spawn buttons
+document.querySelectorAll('[data-spawn]').forEach(btn => {
+  btn.onclick = () => spawnObject(btn.dataset.spawn);
+});
+
+// Sliders
+const displaceSlider = document.getElementById('displace');
+const displaceVal = document.getElementById('displace-val');
+displaceSlider.oninput = () => {
+  state.displaceAmount = parseFloat(displaceSlider.value);
+  displaceVal.textContent = state.displaceAmount.toFixed(1);
+};
+displaceSlider.onchange = () => {
+  if (state.lastImage && state.lastDepth) buildTerrain();
+};
+
+const segSlider = document.getElementById('segments');
+const segVal = document.getElementById('seg-val');
+segSlider.oninput = () => {
+  state.meshSegments = parseInt(segSlider.value);
+  segVal.textContent = state.meshSegments;
+};
+segSlider.onchange = () => {
+  if (state.lastImage && state.lastDepth) buildTerrain();
+};
+
+// Reset camera
+document.getElementById('reset-cam').onclick = () => {
+  const planeW = 12;
+  const aspect = state.lastImage ? state.lastImage.width / state.lastImage.height : 1;
+  const planeH = planeW / aspect;
+  const dist = Math.max(planeW, planeH) * 1.1;
+  camera.position.set(0, dist * 0.55, dist * 0.95);
+  controls.target.set(0, 0, 0);
+  controls.update();
+};
+
+// Clear
+document.getElementById('clear-objects').onclick = clearDynamicObjects;
+
+// Paint toggle
+document.getElementById('paint-toggle').onclick = () => setPaintMode(!state.paintMode);
+
+// Paint swatches
+document.querySelectorAll('.paint-swatch').forEach(sw => {
+  sw.onclick = () => {
+    document.querySelectorAll('.paint-swatch').forEach(s => s.classList.remove('active'));
+    sw.classList.add('active');
+    state.paintColor = sw.dataset.color;
+  };
+});
+
+// Paint size
+document.getElementById('paint-size').oninput = (e) => {
+  state.paintSize = parseFloat(e.target.value);
+};
+
+// Clear paint
+document.getElementById('clear-paint').onclick = clearPaintSplats;
+
+// Fly through
+document.getElementById('fly-btn').onclick = startFlyThrough;
+
+// Export
+document.getElementById('export-gltf').onclick = exportGLTF;
+
+// Drag & drop the whole window
+window.addEventListener('dragover', e => { e.preventDefault(); });
+window.addEventListener('drop', e => {
+  e.preventDefault();
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) processImage(f);
+});
+</script>
+</body>
+</html>

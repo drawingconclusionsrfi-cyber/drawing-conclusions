@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drawing Conclusions LLC — Portfolio & Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#1e1e1e;--cream:#f5f0e8;--terracotta:#c4542a;--ochre:#d4920a;
+  --burnt:#8b3a1a;--electric:#7c3aed;--neon:#00ff88;--hot:#ff2d78;
+  --cyber:#00e5ff;--warm-dark:#1a0f05;--card-bg:#1e130a;
+}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--cream);font-family:'Syne',sans-serif;overflow-x:hidden;cursor:none}
+.cursor{position:fixed;width:12px;height:12px;background:var(--neon);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.1s;mix-blend-mode:difference;top:0;left:0}
+.cursor-ring{position:fixed;width:36px;height:36px;border:1.5px solid var(--terracotta);border-radius:50%;pointer-events:none;z-index:9998;transition:all 0.15s ease;top:0;left:0}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.2rem 1.5rem;display:flex;justify-content:space-between;align-items:center;background:rgba(13,10,6,0.9);backdrop-filter:blur(12px);border-bottom:1px solid rgba(196,84,42,0.2)}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.08em;color:var(--cream);text-decoration:none;white-space:nowrap;flex-shrink:0}
+.logo span{color:var(--terracotta)}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{color:rgba(245,240,232,0.6);text-decoration:none;font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;font-family:'Space Mono',monospace;transition:color 0.2s}
+.nav-links a:hover{color:var(--neon)}
+.nav-cta{background:var(--terracotta);color:var(--cream);padding:0.5rem 1.4rem;border-radius:2px;font-family:'Space Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;transition:background 0.2s}
+.nav-cta:hover{background:var(--hot);color:#fff}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 3rem;position:relative;overflow:visible}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(196,84,42,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(196,84,42,0.05) 1px,transparent 1px);background-size:60px 60px}
+.hero-orb1{display:none}
+.hero-orb2{display:none}
+.hero-orb3{display:none}
+.hero-content{position:relative;z-index:1}
+.hero-label{font-family:'Space Mono',monospace;font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--neon);margin-bottom:1.5rem;opacity:0.9}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(4rem,10vw,9rem);line-height:0.92;letter-spacing:0.03em;margin-bottom:1.5rem}
+.hero-title .line1{display:block;color:var(--cream)}
+.hero-title .line2{display:block;color:var(--terracotta)}
+.hero-title .line3{display:block;color:transparent;-webkit-text-stroke:1px var(--ochre)}
+.hero-sub{font-family:'Space Mono',monospace;font-size:0.82rem;color:rgba(245,240,232,0.55);max-width:480px;line-height:1.7;margin-bottom:2.5rem}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-primary{background:var(--terracotta);color:var(--cream);padding:0.85rem 2.5rem;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.15em;text-decoration:none;border-radius:2px;transition:all 0.2s;border:none;cursor:none;display:inline-block}
+.btn-primary:hover{background:var(--hot);transform:translateY(-2px)}
+.btn-ghost{border:1px solid rgba(245,240,232,0.25);color:var(--cream);padding:0.85rem 2.5rem;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.15em;text-decoration:none;border-radius:2px;transition:all 0.2s;display:inline-block}
+.btn-ghost:hover{border-color:var(--neon);color:var(--neon)}
+section{padding:6rem 3rem}
+.section-label{font-family:'Space Mono',monospace;font-size:0.68rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--terracotta);margin-bottom:0.75rem}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4.5rem);letter-spacing:0.05em;line-height:1;margin-bottom:2.5rem}
+#gallery{background:var(--warm-dark)}
+.gallery-tabs{display:flex;gap:0;margin-bottom:2.5rem;border:1px solid rgba(196,84,42,0.3);border-radius:3px;overflow:hidden;width:fit-content}
+.tab-btn{background:transparent;border:none;color:rgba(245,240,232,0.5);font-family:'Space Mono',monospace;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.65rem 1.5rem;cursor:none;transition:all 0.2s}
+.tab-btn.active{background:var(--terracotta);color:var(--cream)}
+.tab-btn:hover:not(.active){background:rgba(196,84,42,0.15);color:var(--cream)}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
+.gallery-card{background:var(--card-bg);border:1px solid rgba(196,84,42,0.15);border-radius:4px;overflow:hidden;transition:transform 0.25s,border-color 0.25s;cursor:none}
+.gallery-card:hover{transform:translateY(-4px);border-color:rgba(196,84,42,0.5)}
+.card-placeholder{width:100%;height:180px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.card-tag{position:absolute;top:0.75rem;left:0.75rem;background:var(--terracotta);color:var(--cream);font-family:'Space Mono',monospace;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px}
+.card-body{padding:1rem 1.25rem}
+.card-title{font-size:0.95rem;font-weight:700;margin-bottom:0.35rem}
+.card-meta{font-family:'Space Mono',monospace;font-size:0.68rem;color:rgba(245,240,232,0.4)}
+.upload-area{border:1.5px dashed rgba(196,84,42,0.4);border-radius:4px;padding:2.5rem;text-align:center;margin-top:2rem;transition:border-color 0.2s,background 0.2s;cursor:pointer}
+.upload-area:hover{border-color:var(--neon);background:rgba(0,255,136,0.03)}
+.upload-icon{font-size:2rem;margin-bottom:0.75rem;opacity:0.5}
+.upload-text{font-family:'Space Mono',monospace;font-size:0.78rem;color:rgba(245,240,232,0.5);line-height:1.7}
+.upload-text span{color:var(--terracotta)}
+#sketches{background:var(--ink)}
+.sketches-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
+.sketch-card{background:var(--card-bg);border:1px solid rgba(212,146,10,0.15);border-radius:3px;overflow:hidden;transition:all 0.2s;cursor:none}
+.sketch-card:hover{border-color:var(--ochre);transform:rotate(0.5deg) translateY(-3px)}
+.sketch-placeholder{width:100%;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;position:relative}
+.sketch-lines{position:absolute;inset:0;opacity:0.06;background-image:repeating-linear-gradient(0deg,var(--ochre) 0px,var(--ochre) 1px,transparent 1px,transparent 24px)}
+#merch{background:rgba(10,5,2,0.98);position:relative;overflow:hidden}
+.merch-accent{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--terracotta),var(--electric),var(--hot),var(--cyber),var(--terracotta))}
+.merch-categories{display:flex;gap:1rem;margin-bottom:2.5rem;flex-wrap:wrap}
+.merch-cat{border:1px solid rgba(245,240,232,0.12);padding:0.5rem 1.2rem;border-radius:2px;font-family:'Space Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;cursor:none;transition:all 0.2s;color:rgba(245,240,232,0.5);background:transparent}
+.merch-cat.active,.merch-cat:hover{background:var(--electric);border-color:var(--electric);color:white}
+.merch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem}
+.merch-card{background:var(--card-bg);border:1px solid rgba(124,58,237,0.2);border-radius:4px;overflow:hidden;cursor:none;transition:all 0.25s}
+.merch-card:hover{transform:translateY(-5px);border-color:var(--electric);box-shadow:0 20px 60px rgba(124,58,237,0.15)}
+.merch-img{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative}
+.merch-badge{position:absolute;top:0.75rem;right:0.75rem;background:var(--hot);color:white;font-family:'Space Mono',monospace;font-size:0.58rem;padding:0.2rem 0.5rem;border-radius:2px;letter-spacing:0.1em}
+.merch-price{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--ochre);letter-spacing:0.05em;margin-top:0.5rem}
+.merch-link{display:inline-block;margin-top:0.85rem;font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--cyber);text-decoration:none;opacity:0.8}
+.merch-link:hover{opacity:1}
+.merch-link2{color:var(--ochre)}
+.pay-badges{display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;justify-content:center}
+.pay-badge{background:rgba(245,240,232,0.06);border:1px solid rgba(245,240,232,0.1);padding:0.3rem 0.8rem;border-radius:2px;font-family:'Space Mono',monospace;font-size:0.6rem;color:rgba(245,240,232,0.5);letter-spacing:0.08em}
+.pay-link{background:rgba(245,240,232,0.06);border:1px solid rgba(245,240,232,0.1);padding:0.3rem 0.8rem;border-radius:2px;font-family:'Space Mono',monospace;font-size:0.6rem;color:rgba(245,240,232,0.5);letter-spacing:0.08em;text-decoration:none;transition:all 0.2s}
+.pay-link:hover{background:rgba(245,240,232,0.1);color:var(--cream)}
+#services{background:var(--warm-dark)}
+.services-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:3rem}
+.service-card{background:var(--card-bg);border:1px solid rgba(196,84,42,0.2);border-radius:4px;padding:2rem;position:relative;overflow:hidden;transition:border-color 0.2s;cursor:none}
+.service-card:hover{border-color:var(--terracotta)}
+.service-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.service-card.design::before{background:linear-gradient(90deg,var(--terracotta),var(--ochre))}
+.service-card.commission::before{background:linear-gradient(90deg,var(--electric),var(--hot))}
+.service-icon{font-size:2rem;margin-bottom:1rem}
+.service-name{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:0.08em;margin-bottom:0.75rem}
+.service-desc{font-family:'Space Mono',monospace;font-size:0.75rem;color:rgba(245,240,232,0.5);line-height:1.8;margin-bottom:1.5rem}
+.service-price{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--ochre);letter-spacing:0.05em;margin-bottom:1.25rem}
+.btn-book{width:100%;background:transparent;border:1px solid var(--terracotta);color:var(--terracotta);font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.15em;padding:0.85rem;border-radius:2px;cursor:none;transition:all 0.2s;text-transform:uppercase}
+.btn-book:hover{background:var(--terracotta);color:var(--cream)}
+.booking-form{background:var(--card-bg);border:1px solid rgba(196,84,42,0.25);border-radius:4px;padding:2.5rem;margin-top:2rem}
+.booking-form h3{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:0.08em;margin-bottom:0.5rem}
+.booking-form .sub{font-family:'Space Mono',monospace;font-size:0.72rem;color:rgba(245,240,232,0.45);margin-bottom:2rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.form-group{display:flex;flex-direction:column;gap:0.4rem;margin-bottom:1rem}
+.form-label{font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,240,232,0.45)}
+.form-input,.form-select,.form-textarea{background:rgba(245,240,232,0.04);border:1px solid rgba(196,84,42,0.2);border-radius:3px;color:var(--cream);font-family:'Space Mono',monospace;font-size:0.8rem;padding:0.75rem 1rem;outline:none;transition:border-color 0.2s;width:100%}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--terracotta)}
+.form-select option{background:var(--ink)}
+.form-textarea{min-height:100px;resize:vertical;line-height:1.6}
+.btn-submit{width:100%;background:var(--terracotta);color:var(--cream);border:none;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.15em;padding:1rem;border-radius:2px;cursor:none;transition:all 0.2s;margin-top:1rem}
+.btn-submit:hover{background:var(--hot);transform:translateY(-2px)}
+.ai-note{display:flex;align-items:flex-start;gap:0.75rem;background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.15);border-radius:3px;padding:1rem;margin-top:1rem}
+.ai-dot{width:8px;height:8px;border-radius:50%;background:var(--neon);flex-shrink:0;margin-top:4px;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.ai-note p{font-family:'Space Mono',monospace;font-size:0.68rem;color:rgba(0,255,136,0.7);line-height:1.7}
+.booking-confirm{display:none;background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.2);border-radius:4px;padding:2rem;margin-top:2rem;text-align:center}
+#assistant{background:var(--ink);border-top:1px solid rgba(196,84,42,0.15)}
+.chat-container{background:var(--card-bg);border:1px solid rgba(196,84,42,0.2);border-radius:4px;overflow:hidden;max-width:700px}
+.chat-header{background:rgba(196,84,42,0.1);padding:1rem 1.5rem;border-bottom:1px solid rgba(196,84,42,0.2);display:flex;align-items:center;gap:0.75rem}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--neon);animation:pulse 2s ease-in-out infinite}
+.chat-title{font-family:'Space Mono',monospace;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;margin-left:0.5rem}
+.chat-subtitle{font-family:'Space Mono',monospace;font-size:0.62rem;color:rgba(245,240,232,0.35);margin-left:0.5rem}
+.chat-messages{padding:1.5rem;display:flex;flex-direction:column;gap:1rem;min-height:280px;max-height:380px;overflow-y:auto}
+.msg{max-width:85%;display:flex;flex-direction:column;gap:0.35rem}
+.msg.ai{align-self:flex-start}
+.msg.user{align-self:flex-end;align-items:flex-end}
+.msg-bubble{padding:0.75rem 1rem;border-radius:3px;font-family:'Space Mono',monospace;font-size:0.75rem;line-height:1.7}
+.msg.ai .msg-bubble{background:rgba(196,84,42,0.12);border:1px solid rgba(196,84,42,0.2);color:rgba(245,240,232,0.85)}
+.msg.user .msg-bubble{background:var(--terracotta);color:var(--cream)}
+.msg-time{font-family:'Space Mono',monospace;font-size:0.58rem;color:rgba(245,240,232,0.25)}
+.chat-input-row{display:flex;border-top:1px solid rgba(196,84,42,0.2)}
+.chat-input{flex:1;background:rgba(245,240,232,0.03);border:none;color:var(--cream);font-family:'Space Mono',monospace;font-size:0.78rem;padding:1rem 1.25rem;outline:none}
+.chat-input::placeholder{color:rgba(245,240,232,0.25)}
+.chat-send{background:var(--terracotta);border:none;color:var(--cream);padding:1rem 1.5rem;font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:0.12em;cursor:pointer;transition:background 0.2s}
+.chat-send:hover{background:var(--hot)}
+.typing{display:flex;gap:4px;align-items:center;padding:0.75rem 1rem}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--terracotta);animation:typingDot 1.2s ease-in-out infinite}
+.typing span:nth-child(2){animation-delay:0.2s}
+.typing span:nth-child(3){animation-delay:0.4s}
+@keyframes typingDot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.quick-actions{display:flex;gap:0.5rem;flex-wrap:wrap;padding:0.75rem 1.25rem;border-top:1px solid rgba(196,84,42,0.1)}
+.quick-btn{background:transparent;border:1px solid rgba(196,84,42,0.25);color:rgba(245,240,232,0.55);font-family:'Space Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;padding:0.3rem 0.75rem;border-radius:2px;cursor:pointer;transition:all 0.2s}
+.quick-btn:hover{border-color:var(--terracotta);color:var(--cream);background:rgba(196,84,42,0.1)}
+footer{background:var(--warm-dark);border-top:1px solid rgba(196,84,42,0.2);padding:3rem 3rem 2rem}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;margin-bottom:2.5rem}
+.footer-brand .logo{font-size:1.2rem;display:block;margin-bottom:1rem}
+.footer-brand p{font-family:'Space Mono',monospace;font-size:0.72rem;color:rgba(245,240,232,0.35);line-height:1.8;max-width:300px}
+.footer-col h4{font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--terracotta);margin-bottom:1rem}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:0.5rem}
+.footer-col ul a{color:rgba(245,240,232,0.4);text-decoration:none;font-family:'Space Mono',monospace;font-size:0.72rem;transition:color 0.2s}
+.footer-col ul a:hover{color:var(--cream)}
+.footer-bottom{border-top:1px solid rgba(196,84,42,0.1);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.footer-copy{font-family:'Space Mono',monospace;font-size:0.65rem;color:rgba(245,240,232,0.25)}
+.payment-row{display:flex;gap:0.75rem;align-items:center}
+.fade-up{opacity:0;transform:translateY(30px);transition:opacity 0.6s ease,transform 0.6s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+@keyframes navRingPulse{0%,100%{opacity:0.2}50%{opacity:0.6}}
+@keyframes lmSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.merch-carousel-wrap{display:flex;align-items:center;gap:1rem;position:relative;width:100%}
+.carousel-track-outer{flex:1;overflow:hidden;border-radius:4px}
+.carousel-track{display:flex;gap:1.5rem;transition:transform 0.45s cubic-bezier(0.25,0.46,0.45,0.94);will-change:transform}
+.carousel-track .merch-card{flex:0 0 calc(25% - 1.125rem);min-width:220px}
+.carousel-btn{flex-shrink:0;width:44px;height:44px;background:rgba(196,84,42,0.15);border:1px solid rgba(196,84,42,0.3);border-radius:50%;color:var(--cream);font-size:1.1rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;z-index:2}
+.carousel-btn:hover{background:var(--terracotta);border-color:var(--terracotta)}
+.carousel-dots{display:flex;gap:0.5rem;justify-content:center;margin-top:1.5rem}
+.carousel-dot{width:6px;height:6px;border-radius:50%;background:rgba(245,240,232,0.15);border:none;cursor:pointer;transition:all 0.2s;padding:0}
+.carousel-dot.active{background:var(--terracotta);transform:scale(1.4)}
+.hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;align-items:center;width:100%;gap:2rem}
+.hero-logo-right{position:relative;display:flex;align-items:center;justify-content:center;overflow:visible}
+.hero-logo-right video{width:min(560px,48vw);height:min(560px,48vw);object-fit:contain;border-radius:12px;display:block;position:relative;z-index:1;)}
+.hlr-glow{position:absolute;width:min(500px,55vw);height:min(500px,55vw);background:radial-gradient(circle,rgba(196,84,42,0.2) 0%,rgba(124,58,237,0.1) 40%,transparent 70%);border-radius:50%;animation:heroGlow 4s ease-in-out infinite;pointer-events:none}
+.hlr-ring{position:absolute;width:min(440px,47vw);height:min(440px,47vw);border:1px solid rgba(0,255,136,0.15);border-radius:50%;animation:heroRing 4s ease-in-out infinite;pointer-events:none}
+@keyframes heroGlow{0%,100%{transform:scale(1);opacity:0.6}50%{transform:scale(1.08);opacity:1}}
+@keyframes heroRing{0%,100%{transform:scale(1);opacity:0.15}50%{transform:scale(1.04);opacity:0.5}}
+.wd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:2rem}
+.wd-card{background:var(--card-bg);border:1px solid rgba(0,229,255,0.2);border-radius:4px;overflow:hidden;transition:transform 0.25s,border-color 0.25s}
+.wd-card:hover{transform:translateY(-5px);border-color:var(--cyber);box-shadow:0 20px 60px rgba(0,229,255,0.08)}
+.wd-preview{position:relative;width:100%;height:220px;overflow:hidden;background:#0a0a0a}
+.wd-preview iframe{width:200%;height:200%;transform:scale(0.5);transform-origin:top left;border:none;pointer-events:none}
+.wd-overlay{position:absolute;inset:0;background:rgba(13,10,6,0.6);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.25s}
+.wd-card:hover .wd-overlay{opacity:1}
+.wd-visit-btn{background:var(--cyber);color:var(--ink);font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.15em;padding:0.65rem 1.75rem;border-radius:2px;text-decoration:none;transition:background 0.2s;cursor:pointer}
+.wd-visit-btn:hover{background:var(--neon)}
+.wd-info{padding:1.5rem}
+.wd-tags{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem}
+.wd-tag{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;padding:2px 6px;border-radius:2px;border:1px solid}
+.wd-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.08em;color:var(--cream);margin-bottom:0.5rem}
+.wd-desc{font-family:'Space Mono',monospace;font-size:0.72rem;color:rgba(245,240,232,0.45);line-height:1.8;margin-bottom:1rem}
+.wd-link{font-family:'Space Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--cyber);text-decoration:none;transition:opacity 0.2s}
+.wd-link:hover{opacity:0.7}
+.wd-add-card{border-style:dashed;border-color:rgba(0,229,255,0.2);display:flex;align-items:center;justify-content:center;min-height:340px}
+.wd-add-inner{text-align:center;padding:2rem}
+.wd-add-icon{font-size:3rem;color:rgba(0,229,255,0.2);margin-bottom:1rem;line-height:1}
+.wd-add-text{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:0.08em;color:rgba(245,240,232,0.3);margin-bottom:0.5rem}
+.wd-add-sub{font-family:'Space Mono',monospace;font-size:0.68rem;color:rgba(245,240,232,0.2)}
+.testimonials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem}
+.t-card{background:var(--card-bg);border:1px solid rgba(196,84,42,0.2);border-radius:4px;padding:2rem;position:relative;overflow:hidden;transition:border-color 0.25s,transform 0.25s}
+.t-card:hover{border-color:var(--terracotta);transform:translateY(-4px)}
+.t-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--terracotta),var(--ochre))}
+.t-quote-mark{font-family:'Bebas Neue',sans-serif;font-size:5rem;color:var(--terracotta);opacity:0.2;line-height:1;margin-bottom:-1rem}
+.t-text{font-family:'Space Mono',monospace;font-size:0.78rem;color:rgba(245,240,232,0.7);line-height:1.9;margin-bottom:1.5rem;font-style:italic}
+.t-footer{display:flex;align-items:center;gap:0.75rem;border-top:1px solid rgba(196,84,42,0.12);padding-top:1rem}
+.t-avatar{width:36px;height:36px;border-radius:50%;background:var(--terracotta);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:0.85rem;color:var(--cream);flex-shrink:0}
+.t-name{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.08em;color:var(--cream)}
+.t-role{font-family:'Space Mono',monospace;font-size:0.6rem;color:rgba(245,240,232,0.35);letter-spacing:0.1em}
+.t-stars{margin-left:auto;color:var(--ochre);font-size:0.75rem;letter-spacing:2px}
+@media(max-width:768px){
+  .cursor,.cursor-ring{display:none!important}
+  nav{padding:0.85rem 1rem}
+  .nav-links{display:none}
+  section{padding:3.5rem 1.25rem}
+  .services-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr}
+  .wd-grid{grid-template-columns:1fr}
+  .hero-inner{grid-template-columns:1fr}
+  .hero-logo-right{order:-1}
+  .hero-logo-right video{width:min(220px,65vw);height:min(220px,65vw)}
+}
+.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:40px;height:40px;background:transparent;border:none;cursor:pointer;padding:0.25rem;flex-shrink:0}
+.hamburger span{display:block;width:24px;height:2px;background:var(--cream);border-radius:2px;transition:all 0.25s}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mobile-nav{position:fixed;top:0;right:-100%;width:75vw;max-width:280px;height:100vh;background:var(--warm-dark);border-left:1px solid rgba(196,84,42,0.2);z-index:999;transition:right 0.3s ease;display:flex;flex-direction:column;padding:5rem 2rem 2rem;gap:1.5rem}
+.mobile-nav.open{right:0}
+.mobile-nav a{color:rgba(245,240,232,0.7);text-decoration:none;font-family:'Space Mono',monospace;font-size:0.82rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.75rem 0;border-bottom:1px solid rgba(196,84,42,0.1);transition:color 0.2s;display:block}
+.mobile-nav-close{position:absolute;top:1.25rem;right:1.25rem;background:transparent;border:none;color:rgba(245,240,232,0.4);font-size:1.1rem;cursor:pointer}
+.mobile-nav-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:998;display:none}
+.mobile-nav-overlay.open{display:block}
+@media(max-width:768px){.hamburger{display:flex}}
+@media(min-width:769px){.mobile-nav{display:none}.mobile-nav-overlay{display:none}}
+
+*{cursor:none!important}
+#dc-cursor{position:fixed;pointer-events:none;z-index:9999;width:24px;height:24px;transform:translate(-50%,-50%)}
+#dc-cursor::before{content:'';position:absolute;width:1px;height:24px;left:50%;top:0;transform:translateX(-50%);background:var(--terracotta)}
+#dc-cursor::after{content:'';position:absolute;width:24px;height:1px;top:50%;left:0;transform:translateY(-50%);background:var(--terracotta)}
+#dc-diamond{position:fixed;pointer-events:none;z-index:9998;width:10px;height:10px;background:var(--terracotta);transform:translate(-50%,-50%) rotate(45deg);transition:width .15s,height .15s;opacity:.85}
+
+
+#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:99999;align-items:center;justify-content:center}
+#lightbox.open{display:flex}
+#lb-img{max-width:82vw;max-height:88vh;object-fit:contain;border-radius:4px}
+#lb-close{position:fixed;top:1rem;right:1.5rem;color:#fff;font-size:3rem;background:none;border:none;cursor:pointer}
+#lb-prev,#lb-next{position:fixed;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);border:none;color:#fff;font-size:2.5rem;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:100001;cursor:pointer}
+#lb-prev{left:1rem}#lb-next{right:1rem}
+
+</style>
+</head>
+<body>
+<div id="dc-cursor"></div><div id="dc-diamond"></div>
+
+
+
+<nav>
+  <a class="logo" href="https://drawingconclusionsrfi-cyber.github.io/drawing-conclusions">Drawing Conclusions <span>LLC</span></a>
+  <ul class="nav-links">
+    <li><a href="https://drawingconclusionsrfi-cyber.github.io/drawing-conclusions/index.html">&#8962; Home</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#sketches">Sketches</a></li>
+    <li><a href="#merch">Merch</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#art-samples">Art</a></li>
+    <li><a href="#design-samples">Design</a></li>
+    <li><a href="#web-design">Web Design</a></li>
+    <li><a href="#assistant">Assistant</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a class="nav-cta" href="#services">Book Now</a>
+  <div style="width:48px;height:48px;flex-shrink:0;position:relative">
+    <img src="logo.png" alt="DC" style="width:100%;height:100%;object-fit:contain;display:block">
+    <div style="position:absolute;inset:-3px;border:1px solid rgba(0,255,136,0.2);border-radius:4px;animation:navRingPulse 3s ease-in-out infinite;pointer-events:none"></div>
+  </div>
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  <div class="mobile-nav" id="mobileNav">
+    <button class="mobile-nav-close" onclick="toggleMenu()">&#10005;</button>
+    <a href="https://drawingconclusionsrfi-cyber.github.io/drawing-conclusions/index.html" onclick="toggleMenu()">&#8962; Home</a>
+    <a href="#gallery" onclick="toggleMenu()">Gallery</a>
+    <a href="#sketches" onclick="toggleMenu()">Sketches</a>
+    <a href="#merch" onclick="toggleMenu()">Merch</a>
+    <a href="#services" onclick="toggleMenu()">Services</a>
+    <a href="#web-design" onclick="toggleMenu()">Web Design</a>
+    <a href="#assistant" onclick="toggleMenu()">Assistant</a>
+    <a href="#testimonials" onclick="toggleMenu()">Reviews</a>
+    <a href="#contact" onclick="toggleMenu()">Contact</a>
+  </div>
+  <div class="mobile-nav-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+</nav>
+
+<section class="hero" id="home">
+  <div class="hero-grid"></div>
+  
+  <div class="hero-inner">
+    <div class="hero-content">
+      <p class="hero-label">&#10022; Art Studio &amp; Creative Services</p>
+      <h1 class="hero-title">
+        <span class="line1">Drawing</span>
+        <span class="line2">Conclusions</span>
+        <span class="line3">LLC</span>
+      </h1>
+      <p class="hero-sub">Where bold strokes meet raw imagination. Original art, graphic design, commissions, and wearable works — all under one roof.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="#gallery">Explore Gallery</a>
+        <a class="btn-ghost" href="#services">Commission Work</a>
+      </div>
+    </div>
+    <div class="hero-logo-right">
+      
+      
+      <img src="logo.png" alt="DC Logo" style="width:min(480px,46vw);height:min(480px,46vw);object-fit:contain;display:block">
+    </div>
+  </div>
+</section>
+
+<section id="gallery">
+  <p class="section-label fade-up">&#10022; 01 — Portfolio</p>
+  <h2 class="section-title fade-up">The Work</h2>
+<div class="fade-up" style="max-width:600px;margin:0 auto 3rem;text-align:center;border:1px solid rgba(196,84,42,0.2);padding:1.5rem 2rem;border-radius:4px;background:rgba(196,84,42,0.04)">
+  <p style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--terracotta);letter-spacing:0.1em;margin-bottom:0.5rem">Commission Your Vision</p>
+  <p style="font-family:'Space Mono',monospace;font-size:0.85rem;color:rgba(245,240,232,0.85);line-height:2;margin-bottom:1rem">Original digital portraits &amp; custom artwork — hand-crafted by a Massachusetts-based artist with over a decade of experience. Whether it's a loved one, a musical icon, or a concept only you can see — we bring it to life.</p>
+  <div style="display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem">
+    <div style="text-align:center"><p style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--cream)">$150</p><p style="font-family:'Space Mono',monospace;font-size:0.7rem;color:rgba(245,240,232,0.65);text-transform:uppercase">Portrait Sketch</p></div>
+    <div style="text-align:center"><p style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--cream)">$250</p><p style="font-family:'Space Mono',monospace;font-size:0.7rem;color:rgba(245,240,232,0.65);text-transform:uppercase">Full Digital Portrait</p></div>
+    <div style="text-align:center"><p style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--cream)">$400</p><p style="font-family:'Space Mono',monospace;font-size:0.7rem;color:rgba(245,240,232,0.65);text-transform:uppercase">Custom Scene / Logo Art</p></div>
+  </div>
+  <p style="font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--terracotta)">✦ Boston-area agencies charge $800–$2,500 for comparable work. You pay less. You get more.</p>
+  <a href="#contact" style="display:inline-block;margin-top:1rem;font-family:'Space Mono',monospace;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink);background:var(--terracotta);padding:0.6rem 1.5rem;text-decoration:none;border-radius:2px">Book a Commission →</a>
+</div>
+
+  <div class="gallery-tabs fade-up">
+    <button class="tab-btn active" onclick="switchTab('collections',this)">Collections</button>
+    <button class="tab-btn" onclick="switchTab('series',this)">Series</button>
+    <button class="tab-btn" onclick="switchTab('standalone',this)">Standalone</button>
+  </div>
+  <div class="gallery-grid fade-up" id="galleryGrid"><div class="gallery-card"><div style="background:#111;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="artwork-01.jpg" alt="Buju Banton" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><div style="padding:.75rem 1rem"><p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);margin:0">Buju Banton</p><p style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(245,240,232,.5);text-transform:uppercase;margin:.2rem 0 0">Digital Portrait</p></div></div><div class="gallery-card"><div style="background:#111;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="artwork-02.jpg" alt="Bob Marley" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><div style="padding:.75rem 1rem"><p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);margin:0">Bob Marley</p><p style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(245,240,232,.5);text-transform:uppercase;margin:.2rem 0 0">Digital Portrait</p></div></div><div class="gallery-card"><div style="background:#111;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="artwork-03.jpg" alt="Queen Bee" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><div style="padding:.75rem 1rem"><p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);margin:0">Queen Bee</p><p style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(245,240,232,.5);text-transform:uppercase;margin:.2rem 0 0">Digital Art</p></div></div><div class="gallery-card"><div style="background:#111;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="artwork-04.jpg" alt="Untitled" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><div style="padding:.75rem 1rem"><p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);margin:0">Untitled</p><p style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(245,240,232,.5);text-transform:uppercase;margin:.2rem 0 0">Digital Art</p></div></div></div>
+  <div class="upload-area fade-up" onclick="document.getElementById('galleryUpload').click()">
+    <input type="file" id="galleryUpload" style="display:none" multiple accept="image/*" onchange="handleUpload(this,'galleryGrid','Collection')">
+    <div class="upload-icon">&#8853;</div>
+    <p class="upload-text"><span>Click to upload</span> or drag and drop your artwork<br>PNG, JPG, WEBP, GIF up to 50MB</p>
+  </div>
+</section>
+
+<section id="sketches">
+  <p class="section-label fade-up">&#10022; 02 — Process</p>
+  <h2 class="section-title fade-up">Sketches <span style="color:var(--ochre)">&amp; Studies</span></h2>
+  <div class="sketches-grid fade-up" id="sketchGrid"><div class="sketch-card"><div style="background:#f5f0e8;height:180px;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="artwork-05.jpg" alt="Caesar" loading="lazy" style="width:100%;height:100%;object-fit:contain"></div><div style="padding:.75rem 1rem"><p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);margin:0">Caesar — Planet of the Apes</p><p style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(245,240,232,.5);text-transform:uppercase">Ballpoint Pen</p></div></div></div>
+  <div class="upload-area fade-up" style="border-color:rgba(212,146,10,0.35)" onclick="document.getElementById('sketchUpload').click()">
+    <input type="file" id="sketchUpload" style="display:none" multiple accept="image/*" onchange="handleUpload(this,'sketchGrid','Sketch')">
+    <div class="upload-icon">&#9999;</div>
+    <p class="upload-text"><span style="color:var(--ochre)">Upload sketches</span> — rough work, studies, process shots</p>
+  </div>
+</section>
+
+<section id="merch">
+  <div class="merch-accent"></div>
+  <p class="section-label fade-up">&#10022; 03 — Store</p>
+  <h2 class="section-title fade-up">Merch <span style="color:var(--electric)">&amp; Drops</span></h2>
+  <div class="merch-categories fade-up">
+    <button class="merch-cat active" onclick="filterMerch('all',this)">All Items</button>
+    <button class="merch-cat" onclick="filterMerch('tshirt',this)">T-Shirts</button>
+    <button class="merch-cat" onclick="filterMerch('hat',this)">Hats</button>
+    <button class="merch-cat" onclick="filterMerch('mug',this)">Mugs</button>
+    <button class="merch-cat" onclick="filterMerch('print',this)">Art Prints</button>
+  </div>
+  <div class="merch-carousel-wrap fade-up">
+    <button class="carousel-btn" onclick="slideCarousel(-1)">&#8592;</button>
+    <div class="carousel-track-outer">
+      <div class="carousel-track" id="carouselTrack"></div>
+    </div>
+    <button class="carousel-btn" onclick="slideCarousel(1)">&#8594;</button>
+  </div>
+  <div class="carousel-dots" id="carouselDots"></div>
+  <div class="pay-badges fade-up" style="margin-top:2.5rem">
+    <span style="font-family:'Space Mono',monospace;font-size:0.68rem;color:rgba(245,240,232,0.35);align-self:center;margin-right:0.5rem">Accepts:</span>
+    <a href="https://cash.app/$DCRProdpay" class="pay-link" target="_blank">$ CashApp</a>
+    <a href="#" class="pay-link" target="_blank">&#9642; Square</a>
+    <span class="pay-badge">Venmo</span><span class="pay-badge">Zelle</span><span class="pay-badge">PayPal</span>
+  </div>
+</section>
+
+<section id="services">
+  <p class="section-label fade-up">&#10022; 04 — Services</p>
+  <h2 class="section-title fade-up">Book <span style="color:var(--terracotta)">a Session</span></h2>
+  <div class="services-grid fade-up">
+    <div class="service-card design">
+      <div class="service-icon">&#9672;</div>
+      <h3 class="service-name">Graphic Design</h3>
+      <p class="service-desc">Logos, brand identity, flyers, social graphics, merchandise layout, and more.</p>
+      <p class="service-price">From $75</p>
+      <button class="btn-book" onclick="openBooking('Graphic Design')">Schedule Consultation</button>
+    </div>
+    <div class="service-card commission">
+      <div class="service-icon">&#9673;</div>
+      <h3 class="service-name">Art Commission</h3>
+      <p class="service-desc">Custom original artwork — portraits, abstract pieces, character art, murals, and digital illustrations.</p>
+      <p class="service-price">From $120</p>
+      <button class="btn-book" onclick="openBooking('Art Commission')">Request Commission</button>
+    </div>
+  </div>
+  <div class="booking-form" id="bookingForm" style="display:none">
+    <h3 id="bookingTitle">Schedule an Appointment</h3>
+    <p class="sub">Our AI assistant checks availability in real-time.</p>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">First Name</label><input class="form-input" type="text" id="firstName" placeholder="First name"></div>
+      <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" type="text" id="lastName" placeholder="Last name"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="clientEmail" placeholder="your@email.com"></div>
+      <div class="form-group"><label class="form-label">Phone</label><input class="form-input" type="tel" id="clientPhone" placeholder="(555) 000-0000"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Preferred Date</label><input class="form-input" type="date" id="bookDate"></div>
+      <div class="form-group"><label class="form-label">Preferred Time</label>
+        <select class="form-select" id="bookTime">
+          <option value="">Select a time slot</option>
+          <option>9:00 AM</option><option>10:00 AM</option><option>11:00 AM</option>
+          <option>1:00 PM</option><option>2:00 PM</option><option>3:00 PM</option><option>4:00 PM</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Service Type</label>
+      <select class="form-select" id="serviceType">
+        <option>Graphic Design — Logo</option><option>Graphic Design — Brand Identity</option>
+        <option>Art Commission — Portrait</option><option>Art Commission — Abstract</option>
+        <option>Merchandise Design</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Project Details</label>
+      <textarea class="form-textarea" id="projectDetails" placeholder="Tell me about your project..."></textarea>
+    </div>
+    <div class="ai-note"><div class="ai-dot"></div><p>AI assistant checks your booking against the calendar in real-time. Conflicts flagged automatically.</p></div>
+    <button class="btn-submit" onclick="submitBooking()">Confirm &amp; Check Availability &#8594;</button>
+  </div>
+  <div class="booking-confirm" id="bookingConfirm">
+    <p style="font-size:2rem;margin-bottom:0.75rem">&#10003;</p>
+    <h3 style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--neon);margin-bottom:0.5rem">Slot Confirmed!</h3>
+    <p style="font-family:'Space Mono',monospace;font-size:0.75rem;color:rgba(245,240,232,0.5);line-height:1.8" id="confirmDetails"></p>
+  </div>
+</section>
+
+
+<section id="art-samples" style="background:var(--ink);padding:6rem 3rem;border-top:1px solid rgba(196,84,42,0.15)"><p class="section-label fade-up">&#10022; Art Samples</p><h2 class="section-title fade-up">Digital &amp; Traditional Art</h2><div class="gallery-grid fade-up" style="margin-top:2rem"><div class="gallery-card"><div style="background:#111;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="artwork-01.jpg" alt="Buju Banton" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><div style="padding:.75rem 1rem"><p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);margin:0">Buju Banton</p><p style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(245,240,232,.5);text-transform:uppercase;margin:.2rem 0 0">Digital Portrait</p></div></div><div class="gallery-card"><div style="background:#111;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="artwork-02.jpg" alt="Bob Marley" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><div style="padding:.75rem 1rem"><p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);margin:0">Bob Marley</p><p style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(245,240,232,.5);text-transform:uppercase;margin:.2rem 0 0">Digital Portrait</p></div></div><div class="gallery-card"><div style="background:#111;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="artwork-03.jpg" alt="Queen Bee" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><div style="padding:.75rem 1rem"><p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);margin:0">Queen Bee</p><p style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(245,240,232,.5);text-transform:uppercase;margin:.2rem 0 0">Digital Art</p></div></div><div class="gallery-card"><div style="background:#111;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="artwork-04.jpg" alt="Untitled" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><div style="padding:.75rem 1rem"><p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);margin:0">Untitled</p><p style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(245,240,232,.5);text-transform:uppercase;margin:.2rem 0 0">Digital Art</p></div></div><div class="gallery-card"><div style="background:#f5f0e8;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="artwork-05.jpg" alt="Caesar — Planet of the Apes" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><div style="padding:.75rem 1rem"><p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);margin:0">Caesar — Planet of the Apes</p><p style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(245,240,232,.5);text-transform:uppercase;margin:.2rem 0 0">Ballpoint Pen</p></div></div></div></section>
+<section id="design-samples" style="background:var(--ink)">
+  <p class="section-label fade-up">&#10022; 05 — Graphic Design</p>
+  <h2 class="section-title fade-up">Design <span style="color:var(--ochre)">Samples</span></h2>
+
+<div class="fade-up" style="max-width:650px;margin:0 auto 3rem;text-align:center;border:1px solid rgba(212,146,10,0.25);padding:1.5rem 2rem;border-radius:4px;background:rgba(212,146,10,0.04)">
+  <p style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--ochre);letter-spacing:0.1em;margin-bottom:0.5rem">Your Brand Starts With a Great Logo</p>
+  <p style="font-family:'Space Mono',monospace;font-size:0.85rem;color:rgba(245,240,232,0.85);line-height:2;margin-bottom:1rem">A logo is the face of your business — bold, memorable, and uniquely yours. Drawing Conclusions LLC delivers professional logo and brand identity design at rates Boston agencies can't touch.</p>
+  <div style="display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem">
+    <div style="text-align:center"><p style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--cream)">$275</p><p style="font-family:'Space Mono',monospace;font-size:0.7rem;color:rgba(245,240,232,0.65);text-transform:uppercase">Logo Design</p></div>
+    <div style="text-align:center"><p style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--cream)">$450</p><p style="font-family:'Space Mono',monospace;font-size:0.7rem;color:rgba(245,240,232,0.65);text-transform:uppercase">Logo + Brand Kit</p></div>
+    <div style="text-align:center"><p style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--cream)">$600</p><p style="font-family:'Space Mono',monospace;font-size:0.7rem;color:rgba(245,240,232,0.65);text-transform:uppercase">Full Brand Identity</p></div>
+  </div>
+  <p style="font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--ochre)">✦ Boston agencies charge $800–$5,000+ for the same work. We deliver the same quality for less.</p>
+  <a href="#contact" style="display:inline-block;margin-top:1rem;font-family:'Space Mono',monospace;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink);background:var(--ochre);padding:0.6rem 1.5rem;text-decoration:none;border-radius:2px">Start Your Brand →</a>
+</div>
+
+  <div class="gallery-grid fade-up" id="designSamplesGrid"><div class="gallery-card"><div style="background:#fff;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="artwork-06.jpg" alt="Yemon Entertainment" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><div style="padding:.75rem 1rem"><p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);margin:0">Yemon Entertainment</p><p style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(245,240,232,.5);text-transform:uppercase;margin:.2rem 0 0">Logo Design</p></div></div><div class="gallery-card"><div style="background:#fff;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="artwork-07.jpg" alt="Cabal — The Party App" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><div style="padding:.75rem 1rem"><p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);margin:0">Cabal — The Party App</p><p style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(245,240,232,.5);text-transform:uppercase;margin:.2rem 0 0">Logo Design</p></div></div><div class="gallery-card"><div style="background:#f5a623;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="artwork-08.jpg" alt="Cultiv8" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><div style="padding:.75rem 1rem"><p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);margin:0">Cultiv8</p><p style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(245,240,232,.5);text-transform:uppercase;margin:.2rem 0 0">Logo Design</p></div></div><div class="gallery-card"><div style="background:#fff;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="artwork-09.jpg" alt="Morris Code Entertainment" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><div style="padding:.75rem 1rem"><p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);margin:0">Morris Code Entertainment</p><p style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(245,240,232,.5);text-transform:uppercase;margin:.2rem 0 0">Logo Design</p></div></div><div class="gallery-card"><div style="background:#111;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="artwork-10.jpg" alt="DJ Doja" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><div style="padding:.75rem 1rem"><p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);margin:0">DJ Doja</p><p style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(245,240,232,.5);text-transform:uppercase;margin:.2rem 0 0">Digital Illustration</p></div></div></div>
+  <div class="upload-area fade-up" style="border-color:rgba(212,146,10,0.35);margin-top:2rem" onclick="document.getElementById('designUpload').click()">
+    <input type="file" id="designUpload" style="display:none" multiple accept="image/*" onchange="handleUpload(this,'designSamplesGrid','Design')">
+    <div class="upload-icon">&#9672;</div>
+    <p class="upload-text"><span style="color:var(--ochre)">Upload design samples</span> — logos, flyers, brand work</p>
+  </div>
+</section>
+
+<!-- WEB DESIGN SECTION -->
+<section id="web-design" style="background:var(--ink);padding:6rem 3rem;border-top:1px solid rgba(196,84,42,0.15)">
+  <p class="section-label fade-up">&#10022; 06 — Web Design</p>
+  <h2 class="section-title fade-up">Web <span style="color:var(--cyber)">Design</span></h2>
+<div class="fade-up" style="max-width:650px;margin:0 auto 3rem;text-align:center;border:1px solid rgba(0,229,255,0.2);padding:1.5rem 2rem;border-radius:4px;background:rgba(0,229,255,0.03)">
+  <p style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--cyber);letter-spacing:0.1em;margin-bottom:0.5rem">Your Business Deserves a Real Website</p>
+  <p style="font-family:'Space Mono',monospace;font-size:0.85rem;color:rgba(245,240,232,0.85);line-height:2;margin-bottom:1rem">Custom-built websites tailored to your brand — no templates, no shortcuts. From local Massachusetts businesses to independent artists, we design sites that convert visitors into customers.</p>
+  <div style="display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem">
+    <div style="text-align:center"><p style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--cream)">$499</p><p style="font-family:'Space Mono',monospace;font-size:0.7rem;color:rgba(245,240,232,0.65);text-transform:uppercase">Single Page / Landing</p></div>
+    <div style="text-align:center"><p style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--cream)">$799</p><p style="font-family:'Space Mono',monospace;font-size:0.7rem;color:rgba(245,240,232,0.65);text-transform:uppercase">Multi-Page Business Site</p></div>
+    <div style="text-align:center"><p style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--cream)">$1,200</p><p style="font-family:'Space Mono',monospace;font-size:0.7rem;color:rgba(245,240,232,0.65);text-transform:uppercase">Full Brand + E-Commerce</p></div>
+  </div>
+  <p style="font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--cyber)">✦ Boston web agencies start at $3,000+. We start at $499 — same quality, better value.</p>
+  <a href="#contact" style="display:inline-block;margin-top:1rem;font-family:'Space Mono',monospace;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink);background:var(--cyber);padding:0.6rem 1.5rem;text-decoration:none;border-radius:2px">Get a Free Quote →</a>
+</div>
+
+  <p style="font-family:'Space Mono',monospace;font-size:0.78rem;color:rgba(245,240,232,0.4);max-width:550px;line-height:1.9;margin-bottom:3rem" class="fade-up">Full websites designed and built from scratch — bold, responsive, and built to convert.</p>
+  <div class="wd-grid fade-up">
+
+    <!-- Harvest & Grow -->
+    <div class="wd-card">
+      <div class="wd-preview">
+        <iframe src="https://drawingconclusionsrfi-cyber.github.io/harvest-and-grow/" title="Harvest &amp; Grow" loading="lazy" scrolling="no"></iframe>
+        <div class="wd-overlay"><a href="https://drawingconclusionsrfi-cyber.github.io/harvest-and-grow/" target="_blank" class="wd-visit-btn">View Live Site &#8594;</a></div>
+      </div>
+      <div class="wd-info">
+        <div class="wd-tags">
+          <span class="wd-tag" style="color:var(--neon);border-color:rgba(0,255,136,0.3)">Web Design</span>
+          <span class="wd-tag" style="color:var(--cyber);border-color:rgba(0,229,255,0.3)">Full Build</span>
+          <span class="wd-tag" style="color:var(--ochre);border-color:rgba(212,146,10,0.3)">E-Commerce</span>
+        </div>
+        <h3 class="wd-title">Harvest &amp; Grow</h3>
+        <p class="wd-desc">Full e-commerce website for a food &amp; agriculture brand. Product ordering, responsive mobile layout, and custom brand design.</p>
+        <a href="https://drawingconclusionsrfi-cyber.github.io/harvest-and-grow/" target="_blank" class="wd-link">Visit Live Site &#8594;</a>
+      </div>
+    </div>
+
+    <!-- Meridian Detail Co. -->
+    <div class="wd-card">
+      <div class="wd-preview" style="background:#0f0f0d;display:flex;align-items:center;justify-content:center">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;width:100%">
+          <svg width="72" height="72" viewBox="0 0 60 60" fill="none">
+            <circle cx="30" cy="30" r="28" stroke="#D3D1C7" stroke-width="0.8"/>
+            <circle cx="30" cy="30" r="19" stroke="#D3D1C7" stroke-width="0.5"/>
+            <line x1="2" y1="30" x2="58" y2="30" stroke="#D3D1C7" stroke-width="0.8"/>
+            <line x1="30" y1="2" x2="30" y2="58" stroke="#D3D1C7" stroke-width="0.8"/>
+            <line x1="50" y1="10" x2="57" y2="3" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="10" y1="10" x2="3" y2="3" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="50" y1="50" x2="57" y2="57" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="10" y1="50" x2="3" y2="57" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/>
+            <text x="30" y="36" font-family="serif" font-size="18" font-weight="700" fill="#F1EFE8" text-anchor="middle">M</text>
+            <circle cx="30" cy="2" r="2" fill="#BA7517"/>
+            <circle cx="58" cy="30" r="2" fill="#BA7517"/>
+            <circle cx="30" cy="58" r="2" fill="#444441"/>
+            <circle cx="2" cy="30" r="2" fill="#444441"/>
+          </svg>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.1em;color:#f1efe8;text-align:center">MERIDIAN DETAIL CO.</div>
+          <div style="font-family:'Space Mono',monospace;font-size:0.58rem;letter-spacing:0.18em;color:#888780;text-align:center">AUTO CARE &amp; FINISH</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">
+            <span style="font-size:0.55rem;padding:2px 6px;border:1px solid rgba(186,117,23,0.5);color:#ba7517;font-family:'Space Mono',monospace">Detailing</span>
+            <span style="font-size:0.55rem;padding:2px 6px;border:1px solid rgba(186,117,23,0.3);color:#888780;font-family:'Space Mono',monospace">Before/After</span>
+            <span style="font-size:0.55rem;padding:2px 6px;border:1px solid rgba(241,239,232,0.2);color:#888780;font-family:'Space Mono',monospace">Booking</span>
+          </div>
+        </div>
+        <div class="wd-overlay"><a href="https://drawingconclusionsrfi-cyber.github.io/meridian-detail-co/" target="_blank" class="wd-visit-btn">View Site &#8594;</a></div>
+      </div>
+      <div class="wd-info">
+        <div class="wd-tags">
+          <span class="wd-tag" style="color:var(--neon);border-color:rgba(0,255,136,0.3)">Web Design</span>
+          <span class="wd-tag" style="color:var(--cyber);border-color:rgba(0,229,255,0.3)">Full Build</span>
+          <span class="wd-tag" style="color:var(--ochre);border-color:rgba(212,146,10,0.3)">Auto Detail</span>
+        </div>
+        <h3 class="wd-title">Meridian Detail Co.</h3>
+        <p class="wd-desc">Luxury auto detailing brand — animated canvas car with glowing rim lighting, real before/after photo sliders, steering wheel cursor, ceramic coating services, and booking form. Dark obsidian aesthetic with gold accents.</p>
+        <a href="https://drawingconclusionsrfi-cyber.github.io/meridian-detail-co/" target="_blank" class="wd-link">View Site &#8594;</a>
+      </div>
+    </div>
+
+    <!-- Lace Morris -->
+    <div class="wd-card">
+      <div class="wd-preview" style="background:#1e1c18;display:flex;align-items:center;justify-content:center">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:20px;width:100%">
+          <img src="artwork-11.jpg" style="width:100px;height:100px;object-fit:contain;border-radius:50%;animation:lmSpin 10s linear infinite" alt="Lace Morris"/>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.1em;color:#f0ebe0;text-align:center">LACE MORRIS</div>
+          <div style="font-family:'Space Mono',monospace;font-size:0.58rem;letter-spacing:0.18em;color:#9a8f7e;text-align:center">INDEPENDENT ARTIST</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">
+            <span style="font-size:0.55rem;padding:2px 6px;border:1px solid rgba(139,58,30,0.5);color:#c45a2e;font-family:'Space Mono',monospace">Music</span>
+            <span style="font-size:0.55rem;padding:2px 6px;border:1px solid rgba(154,124,58,0.5);color:#9a7c3a;font-family:'Space Mono',monospace">Merch</span>
+            <span style="font-size:0.55rem;padding:2px 6px;border:1px solid rgba(240,235,224,0.2);color:#9a8f7e;font-family:'Space Mono',monospace">Artist Hub</span>
+          </div>
+        </div>
+        <div class="wd-overlay"><a href="https://drawingconclusionsrfi-cyber.github.io/lace-morris/" target="_blank" class="wd-visit-btn">View Site &#8594;</a></div>
+      </div>
+      <div class="wd-info">
+        <div class="wd-tags">
+          <span class="wd-tag" style="color:var(--neon);border-color:rgba(0,255,136,0.3)">Web Design</span>
+          <span class="wd-tag" style="color:var(--hot);border-color:rgba(255,45,120,0.3)">Music</span>
+          <span class="wd-tag" style="color:var(--ochre);border-color:rgba(212,146,10,0.3)">Artist Brand</span>
+        </div>
+        <h3 class="wd-title">Lace Morris</h3>
+        <p class="wd-desc">Full artist hub for independent rapper Lace Morris — spinning vinyl record with embedded audio, canvas merch mockups (tees, hats, hoodie, beanie), tour dates, press quotes, and booking form. Custom LM stamp branding throughout.</p>
+        <a href="https://drawingconclusionsrfi-cyber.github.io/lace-morris/" target="_blank" class="wd-link">View Site &#8594;</a>
+      </div>
+    </div>
+
+    <!-- Add More -->
+    <div class="wd-card wd-add-card">
+      <div class="wd-add-inner">
+        <div class="wd-add-icon">+</div>
+        <p class="wd-add-text">More projects coming soon</p>
+        <p class="wd-add-sub">Contact us to discuss your project</p>
+        <a href="#contact" class="wd-visit-btn" style="margin-top:1rem;display:inline-block">Get a Quote &#8594;</a>
+      </div>
+    </div>
+    <div class="wd-card">
+      <div class="wd-preview" style="background:linear-gradient(135deg,#0a0a0a 0%,#1a0a2e 50%,#0d0d0d 100%);display:flex;align-items:center;justify-content:center;height:200px">
+        <p style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:#9b59b6;letter-spacing:0.15em;text-shadow:0 0 20px rgba(155,89,182,0.6)">DJ RIDDIM RIDDER</p>
+      </div>
+      <div class="wd-info">
+        <p class="wd-title">DJ Riddim Ridder</p>
+        <p class="wd-desc">Full artist site for DJ Riddim Ridder — event listings, music, booking, and brand identity.</p>
+        <a href="https://drawingconclusionsrfi-cyber.github.io/dj-riddim-ridder/index.html" target="_blank" class="wd-link">Visit Live Site &#8594;</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="assistant">
+  <p class="section-label fade-up">&#10022; 07 — Studio AI</p>
+  <h2 class="section-title fade-up">Ask the <span style="color:var(--neon)">Assistant</span></h2>
+  <div class="chat-container fade-up">
+    <div class="chat-header">
+      <div class="status-dot"></div>
+      <div><span class="chat-title">DC Studio Assistant</span><br><span class="chat-subtitle">Booking &amp; Inquiry AI</span></div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg ai">
+        <div class="msg-bubble">Hey! Welcome to Drawing Conclusions LLC. I can help with booking, pricing, commission details, or anything about our services. What can I help you with today?</div>
+        <span class="msg-time">Just now</span>
+      </div>
+    </div>
+    <div class="quick-actions">
+      <button class="quick-btn" onclick="quickSend('What are your commission prices?')">Commission pricing</button>
+      <button class="quick-btn" onclick="quickSend('How do I book an appointment?')">How to book</button>
+      <button class="quick-btn" onclick="quickSend('What services do you offer?')">Services offered</button>
+      <button class="quick-btn" onclick="quickSend('How long does a commission take?')">Turnaround time</button>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chatInput" placeholder="Ask anything about services, booking, pricing..." onkeypress="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" onclick="sendChat()">Send &#8594;</button>
+    </div>
+  </div>
+</section>
+
+<section id="contact" style="background:var(--warm-dark)">
+  <p class="section-label fade-up">&#10022; 08 — Get In Touch</p>
+  <h2 class="section-title fade-up">Let's <span style="color:var(--terracotta)">Connect</span></h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start" class="fade-up">
+    <div>
+      <p style="font-family:'Space Mono',monospace;font-size:0.78rem;color:rgba(245,240,232,0.45);line-height:1.9;margin-bottom:2rem">Have a project in mind? Fill out the form and I'll get back to you directly.</p>
+      <div style="display:flex;flex-direction:column;gap:1rem">
+        <a href="mailto:drawingconclusionsrfi@gmail.com" style="display:flex;align-items:center;gap:1rem;text-decoration:none;color:var(--cream);padding:1rem 1.25rem;border:1px solid rgba(196,84,42,0.2);border-radius:3px;font-family:'Space Mono',monospace">
+          <div style="width:36px;height:36px;background:var(--terracotta);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">@</div>
+          <div><p style="font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.35);margin-bottom:0.15rem">Email</p><p style="font-size:0.75rem">drawingconclusionsrfi@gmail.com</p></div>
+        </a>
+        <a href="https://cash.app/$DCRProdpay" target="_blank" style="display:flex;align-items:center;gap:1rem;text-decoration:none;color:var(--cream);padding:1rem 1.25rem;border:1px solid rgba(196,84,42,0.2);border-radius:3px;font-family:'Space Mono',monospace">
+          <div style="width:36px;height:36px;background:var(--neon);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--ink);font-weight:700">$</div>
+          <div><p style="font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.35);margin-bottom:0.15rem">CashApp</p><p style="font-size:0.75rem">$DCRProdpay</p></div>
+        </a>
+        <a href="https://instagram.com/drawingconclusions2020" target="_blank" style="display:flex;align-items:center;gap:1rem;text-decoration:none;color:var(--cream);padding:1rem 1.25rem;border:1px solid rgba(196,84,42,0.2);border-radius:3px;font-family:'Space Mono',monospace">
+          <div style="width:36px;height:36px;background:var(--hot);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">&#9650;</div>
+          <div><p style="font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.35);margin-bottom:0.15rem">Instagram</p><p style="font-size:0.75rem">@drawingconclusions2020</p></div>
+        </a>
+      </div>
+    </div>
+    <div style="background:var(--card-bg);padding:2.5rem;border-radius:3px;border:1px solid rgba(196,84,42,0.2)">
+      <form id="portfolioContactForm" action="https://formspree.io/f/xdayjjdp" method="POST">
+        <div style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:1rem">
+          <label style="font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,240,232,0.45)">Your Name</label>
+          <input class="form-input" type="text" name="name" placeholder="Full name" required>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:1rem">
+          <label style="font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,240,232,0.45)">Email Address</label>
+          <input class="form-input" type="email" name="email" placeholder="your@email.com" required>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:1rem">
+          <label style="font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,240,232,0.45)">Message</label>
+          <textarea class="form-textarea" name="message" placeholder="Tell me about your project..." required></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Send Message &#8594;</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section id="testimonials" style="background:var(--ink);padding:6rem 3rem;border-top:1px solid rgba(196,84,42,0.15)">
+  <p class="section-label fade-up">&#10022; 09 — Client Love</p>
+  <h2 class="section-title fade-up">What Clients <span style="color:var(--terracotta)">Are Saying</span></h2>
+  <div class="testimonials-grid fade-up"><div class="t-card"><div class="t-quote-mark">"</div><p class="t-text">Renford is incredibly talented. The Yemon Entertainment logo was exactly what we envisioned — professional and on time.</p><div class="t-footer"><div class="t-avatar">YE</div><div><p class="t-name">Yemon Entertainment</p><p class="t-role">Logo Design · Client</p></div><div class="t-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div></div><div class="t-card"><div class="t-quote-mark">"</div><p class="t-text">The Cabal logo perfectly captured our brand. Drawing Conclusions LLC delivered beyond expectations.</p><div class="t-footer"><div class="t-avatar">CA</div><div><p class="t-name">Cabal App</p><p class="t-role">Logo Design · Client</p></div><div class="t-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div></div><div class="t-card"><div class="t-quote-mark">"</div><p class="t-text">Seamless experience. The creative vision brought our brand to life beautifully.</p><div class="t-footer"><div class="t-avatar">MC</div><div><p class="t-name">Morris Code Entertainment</p><p class="t-role">Logo Design · Client</p></div><div class="t-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div></div>
+    <div class="t-card"><div class="t-quote-mark">"</div><p class="t-text">Add your first client testimonial here.</p><div class="t-footer"><div class="t-avatar">C1</div><div><p class="t-name">Client Name</p><p class="t-role">Service Type · Year</p></div><div class="t-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div></div>
+    <div class="t-card"><div class="t-quote-mark">"</div><p class="t-text">Add your second client testimonial here.</p><div class="t-footer"><div class="t-avatar">C2</div><div><p class="t-name">Client Name</p><p class="t-role">Service Type · Year</p></div><div class="t-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div></div>
+    <div class="t-card"><div class="t-quote-mark">"</div><p class="t-text">Add your third client testimonial here.</p><div class="t-footer"><div class="t-avatar">C3</div><div><p class="t-name">Client Name</p><p class="t-role">Service Type · Year</p></div><div class="t-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a class="logo" href="https://drawingconclusionsrfi-cyber.github.io/drawing-conclusions">Drawing Conclusions <span>LLC</span></a>
+      <p>Bold art. Fearless creativity. Original work that speaks before you do.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#merch">Merch</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#web-design">Web Design</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Connect</h4>
+      <ul>
+        <li><a href="https://instagram.com/drawingconclusions2020" target="_blank">Instagram</a></li>
+        <li><a href="https://tiktok.com/@drawingconclusions2020" target="_blank">TikTok</a></li>
+        <li><a href="mailto:drawingconclusionsrfi@gmail.com">Email Us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">&#169; 2025 Drawing Conclusions LLC — All rights reserved.</p>
+    <div class="payment-row">
+      <a href="https://cash.app/$DCRProdpay" class="pay-link" target="_blank">$ CashApp</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Diamond cursor
+(function(){
+  var c=document.getElementById('dc-cursor'),d=document.getElementById('dc-diamond');
+  if(!c||!d)return;
+  document.addEventListener('mousemove',function(e){
+    c.style.left=e.clientX+'px';c.style.top=e.clientY+'px';
+    d.style.left=e.clientX+'px';d.style.top=e.clientY+'px';
+  });
+  document.querySelectorAll('a,button,.gallery-card,.sketch-card,.wd-card').forEach(function(el){
+    el.addEventListener('mouseenter',function(){d.style.width='16px';d.style.height='16px';d.style.opacity='1';});
+    el.addEventListener('mouseleave',function(){d.style.width='10px';d.style.height='10px';d.style.opacity='.85';});
+  });
+})();
+
+
+
+const merch=[
+  {emoji:'&#128085;',title:'Void Tee',price:'$38',category:'tshirt',badge:'New'},
+  {emoji:'&#129346;',title:'DC Logo Cap',price:'$32',category:'hat',badge:null},
+  {emoji:'&#9749;',title:'Studio Mug',price:'$22',category:'mug',badge:'Bestseller'},
+  {emoji:'&#128085;',title:'Burn Season Tee',price:'$45',category:'tshirt',badge:null},
+  {emoji:'&#128444;',title:'Phantom Print',price:'$60',category:'print',badge:'Ltd Ed'},
+  {emoji:'&#129346;',title:'Neon Ancestors Cap',price:'$35',category:'hat',badge:null},
+  {emoji:'&#9749;',title:'Ancestor Mug',price:'$24',category:'mug',badge:null},
+  {emoji:'&#128444;',title:'Root Work Print',price:'$75',category:'print',badge:'Ltd Ed'},
+];
+let currentMerch=merch;let carouselIndex=0;
+function filterMerch(cat,btn){
+  document.querySelectorAll('.merch-cat').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentMerch=cat==='all'?merch:merch.filter(m=>m.category===cat);
+  carouselIndex=0;renderCarousel();
+}
+function renderCarousel(){
+  const track=document.getElementById('carouselTrack');
+  track.innerHTML=currentMerch.map(m=>`
+    <div class="merch-card">
+      <div class="merch-img" style="background:linear-gradient(135deg,rgba(124,58,237,0.12),rgba(196,84,42,0.12))">
+        <span style="font-size:3rem">${m.emoji}</span>
+        ${m.badge?`<span class="merch-badge">${m.badge}</span>`:''}
+      </div>
+      <div class="card-body">
+        <p class="card-title">${m.title}</p>
+        <p class="merch-price">${m.price}</p>
+        <a href="https://cash.app/$DCRProdpay" class="merch-link" target="_blank">Buy via CashApp &#8594;</a>
+      </div>
+    </div>`).join('');
+  updateCarouselPos();renderDots();
+}
+function getVisible(){return window.innerWidth<=520?1:window.innerWidth<=900?2:4;}
+function slideCarousel(dir){
+  const max=Math.max(0,currentMerch.length-getVisible());
+  carouselIndex=Math.max(0,Math.min(carouselIndex+dir,max));
+  updateCarouselPos();renderDots();
+}
+function updateCarouselPos(){
+  const card=document.querySelector('.carousel-track .merch-card');
+  if(!card)return;
+  const w=card.offsetWidth+24;
+  document.getElementById('carouselTrack').style.transform=`translateX(-${carouselIndex*w}px)`;
+}
+function renderDots(){
+  const v=getVisible();const total=Math.ceil(currentMerch.length/v);
+  const cur=Math.floor(carouselIndex/v);
+  document.getElementById('carouselDots').innerHTML=Array.from({length:total},(_,i)=>`<button class="carousel-dot${i===cur?' active':''}" onclick="jumpCarousel(${i*v})"></button>`).join('');
+}
+function jumpCarousel(i){carouselIndex=i;updateCarouselPos();renderDots();}
+filterMerch('all',document.querySelector('.merch-cat'));
+window.addEventListener('resize',()=>{updateCarouselPos();renderDots();});
+let activeService='';
+const bookedSlots={};
+function openBooking(service){
+  activeService=service;
+  document.getElementById('bookingTitle').textContent='Book — '+service;
+  document.getElementById('bookingForm').style.display='block';
+  document.getElementById('bookingConfirm').style.display='none';
+  document.getElementById('bookDate').min=new Date().toISOString().split('T')[0];
+  setTimeout(()=>document.getElementById('bookingForm').scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+function submitBooking(){
+  const fn=document.getElementById('firstName').value.trim();
+  const ln=document.getElementById('lastName').value.trim();
+  const date=document.getElementById('bookDate').value;
+  const time=document.getElementById('bookTime').value;
+  if(!fn||!ln||!date||!time){alert('Please fill in your name, date, and time slot.');return;}
+  const key=date+'_'+time;
+  if(bookedSlots[key]){alert('That slot is already booked! Please choose a different time.');return;}
+  bookedSlots[key]=true;
+  document.getElementById('bookingForm').style.display='none';
+  const conf=document.getElementById('bookingConfirm');
+  conf.style.display='block';
+  const d=new Date(date+'T12:00:00');
+  document.getElementById('confirmDetails').textContent=fn+' '+ln+' — '+activeService+'\n'+d.toDateString()+' at '+time;
+}
+const aiResponses={
+  'commission pric':'Art commissions start at $120. Portraits $120–$300, abstract $150–$500, character art from $200+. Free consultation first!',
+  'how do i book':'Scroll to Services and click "Schedule Consultation." Pick your date and time — confirmed instantly!',
+  'what services':'Graphic Design (logos, branding, flyers) from $75 ✦ Art Commissions (portraits, abstract, character art) from $120',
+  'how long':'Graphic design: 3–7 days. Simple commissions: 1–2 weeks. Complex originals: 2–4 weeks.',
+  'payment':'CashApp ($DCRProdpay), Square, Venmo, Zelle, and PayPal. 50% deposit to start.',
+};
+function getAIResponse(msg){
+  const lower=msg.toLowerCase();
+  for(const[key,res]of Object.entries(aiResponses)){if(lower.includes(key))return res;}
+  return 'Great question! Book a free consultation to discuss further. Anything else I can help with? &#127912;';
+}
+function addMsg(text,role){
+  const box=document.getElementById('chatMessages');
+  const div=document.createElement('div');div.className='msg '+role;
+  const t=new Date();
+  div.innerHTML=`<div class="msg-bubble">${text}</div><span class="msg-time">${t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>`;
+  box.appendChild(div);box.scrollTop=box.scrollHeight;
+}
+function sendChat(){
+  const inp=document.getElementById('chatInput');
+  const msg=inp.value.trim();if(!msg)return;
+  addMsg(msg,'user');inp.value='';
+  const box=document.getElementById('chatMessages');
+  const t=document.createElement('div');t.className='msg ai';t.id='typingEl';
+  t.innerHTML='<div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
+  box.appendChild(t);box.scrollTop=box.scrollHeight;
+  setTimeout(()=>{document.getElementById('typingEl')?.remove();addMsg(getAIResponse(msg),'ai');},1200+Math.random()*600);
+}
+function quickSend(msg){document.getElementById('chatInput').value=msg;sendChat();}
+function toggleMenu(){
+  const nav=document.getElementById('mobileNav');
+  const overlay=document.getElementById('menuOverlay');
+  const burger=document.getElementById('hamburger');
+  nav.classList.toggle('open');overlay.classList.toggle('open');burger.classList.toggle('open');
+}
+
+// Scroll reveal
+var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});},{threshold:0.1});
+document.querySelectorAll('.fade-up').forEach(function(el){obs.observe(el);});
+
+// Mobile nav
+function toggleMenu(){
+  const nav=document.getElementById('mobileNav');
+  const overlay=document.getElementById('menuOverlay');
+  const burger=document.getElementById('hamburger');
+  nav.classList.toggle('open');overlay.classList.toggle('open');burger.classList.toggle('open');
+}
+
+// Lightbox
+document.addEventListener('DOMContentLoaded',function(){
+  var allImgs=Array.from(document.querySelectorAll('.gallery-card img,.sketch-card img'));
+  var cur=0;
+  function show(i){cur=i;document.getElementById('lb-img').src=allImgs[i].src;document.getElementById('lightbox').classList.add('open');}
+  allImgs.forEach(function(img,i){img.addEventListener('click',function(e){e.stopPropagation();show(i);});});
+  var prev=document.getElementById('lb-prev');
+  var next=document.getElementById('lb-next');
+  if(prev)prev.addEventListener('click',function(e){e.stopPropagation();show((cur-1+allImgs.length)%allImgs.length);});
+  if(next)next.addEventListener('click',function(e){e.stopPropagation();show((cur+1)%allImgs.length);});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape')document.getElementById('lightbox').classList.remove('open');
+    if(e.key==='ArrowRight')show((cur+1)%allImgs.length);
+    if(e.key==='ArrowLeft')show((cur-1+allImgs.length)%allImgs.length);
+  });
+});
+</script>
+
+<div id="lightbox" onclick="this.classList.remove('open')">
+  <button id="lb-close" onclick="document.getElementById('lightbox').classList.remove('open')">&times;</button>
+  <button id="lb-prev" onclick="event.stopPropagation()">&#8249;</button>
+  <img id="lb-img" src="" alt="" onclick="event.stopPropagation()">
+  <button id="lb-next" onclick="event.stopPropagation()">&#8250;</button>
+</div>
+</body>
+</html>

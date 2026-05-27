@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Drawing Conclusions LLC — Business Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+html,body{
+  width:100%;
+  min-height:100vh;
+  background:#b0b0b0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  font-family:'Space Mono',monospace;
+  padding:2rem 1rem;
+  gap:1.5rem;
+}
+
+/* ═══════════════════════════════════
+   INTRO OVERLAY — plays first
+═══════════════════════════════════ */
+#intro{
+  position:fixed;
+  inset:0;
+  background:#0d0a06;
+  z-index:999;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:1.5rem;
+  transition:opacity 0.8s ease;
+}
+#intro.gone{
+  opacity:0;
+  pointer-events:none;
+}
+.intro-vid{
+  width:180px;
+  height:180px;
+  border-radius:12px;
+  overflow:hidden;
+  position:relative;
+}
+.intro-vid video{
+  width:100%;height:100%;
+  object-fit:contain;display:block;
+}
+.intro-glow{
+  position:absolute;inset:-20px;
+  background:radial-gradient(circle,rgba(196,84,42,0.4) 0%,transparent 65%);
+  border-radius:50%;
+  animation:gPulse 2s ease-in-out infinite;
+  z-index:-1;
+}
+@keyframes gPulse{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.15);opacity:1}}
+.intro-name{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2.8rem;
+  letter-spacing:6px;
+  color:#f5f0e8;
+  text-align:center;
+  line-height:1;
+}
+.intro-name span{color:#c4542a}
+.intro-bar{
+  width:200px;height:2px;
+  background:rgba(245,240,232,0.1);
+  overflow:hidden;
+}
+.intro-bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,#c4542a,#00ff88);
+  animation:barFill 2.5s linear forwards;
+}
+@keyframes barFill{from{width:0}to{width:100%}}
+.intro-skip{
+  font-size:0.55rem;letter-spacing:3px;
+  text-transform:uppercase;
+  color:rgba(245,240,232,0.25);
+  background:none;border:none;
+  cursor:pointer;font-family:'Space Mono',monospace;
+  transition:color 0.2s;
+}
+.intro-skip:hover{color:rgba(245,240,232,0.6)}
+
+/* ═══════════════════════════════════
+   WHITE PAPER — the card sits on this
+   Visible white border on all sides
+═══════════════════════════════════ */
+#paper{
+  /* White sheet of paper */
+  background:#ffffff;
+  /* Thick visible white padding around the card */
+  padding:48px 56px;
+  border-radius:4px;
+  /* Paper shadow so it lifts off the grey desk */
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.15),
+    0 8px 24px rgba(0,0,0,0.18),
+    0 24px 64px rgba(0,0,0,0.12);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:16px;
+  /* Cap width so card never stretches full screen */
+  width:min(640px, 94vw);
+}
+
+.paper-label{
+  align-self:flex-start;
+  font-size:9px;letter-spacing:2.5px;
+  text-transform:uppercase;
+  color:#bbb;
+}
+
+/* ═══════════════════════════════════
+   THE BUSINESS CARD
+   — fixed aspect ratio 3.5:2
+   — visible rounded border on all 4 sides
+   — hard shadow so edges are obvious
+═══════════════════════════════════ */
+#bcard{
+  /* Force exact 3.5:2 business card shape */
+  width:100%;
+  aspect-ratio:3.5 / 2;
+  border-radius:10px;
+  overflow:hidden;
+  position:relative;
+  /* Multi-layer shadow = physical card edges */
+  box-shadow:
+    0 0 0 1.5px #777,       /* outer dark edge */
+    0 0 0 4px #ffffff,       /* white gap */
+    0 0 0 5px #999,          /* second border line */
+    0 8px 24px rgba(0,0,0,0.35),
+    0 2px 6px rgba(0,0,0,0.2);
+  /* Flip transform */
+  transform-style:preserve-3d;
+  transition:transform 0.75s cubic-bezier(0.4,0,0.2,1);
+}
+#bcard.flipped{transform:rotateY(180deg)}
+
+/* ═══════ FACES ═══════ */
+.face{
+  position:absolute;inset:0;
+  border-radius:10px;overflow:hidden;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+.face-back{transform:rotateY(180deg)}
+
+/* ═══════ FRONT ═══════ */
+.front{
+  background:#0d0a06;
+  display:grid;
+  grid-template-rows:4px 1fr 16px;
+}
+.top-stripe{
+  background:linear-gradient(90deg,
+    #c4542a 0%,#d4920a 25%,#ff2d78 50%,#00e5ff 75%,#00ff88 100%);
+}
+.front-content{
+  display:grid;
+  grid-template-columns:30% 1fr;
+  position:relative;overflow:hidden;
+}
+/* Dot texture */
+.front-content::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(circle,rgba(196,84,42,0.07) 1px,transparent 1px);
+  background-size:18px 18px;pointer-events:none;z-index:0;
+}
+
+/* Left panel */
+.lp{
+  background:#1a0f05;
+  border-right:1px solid rgba(196,84,42,0.25);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:6%;padding:6% 4%;
+  position:relative;overflow:hidden;z-index:1;
+}
+.lp::after{
+  content:'';position:absolute;
+  width:100%;height:60%;
+  background:radial-gradient(circle,rgba(196,84,42,0.12) 0%,transparent 70%);
+  bottom:-20%;border-radius:50%;pointer-events:none;
+}
+/* Animated logo */
+.lv{position:relative;width:56%;aspect-ratio:1;z-index:2}
+.lv video{width:100%;height:100%;object-fit:contain;border-radius:5px;display:block}
+.lv-glow{
+  position:absolute;inset:-18%;
+  background:radial-gradient(circle,rgba(196,84,42,0.45) 0%,transparent 65%);
+  border-radius:50%;animation:gPulse 3s ease-in-out infinite;z-index:-1;
+}
+.lv-ring{
+  position:absolute;inset:-5%;
+  border:1.5px solid rgba(0,255,136,0.4);
+  border-radius:8px;
+  animation:rPulse 3s ease-in-out infinite;z-index:3;pointer-events:none;
+}
+@keyframes rPulse{0%,100%{opacity:0.15;box-shadow:none}50%{opacity:0.85;box-shadow:0 0 10px rgba(0,255,136,0.3)}}
+.lb{text-align:center;z-index:2}
+.lb-d{font-family:'Bebas Neue',sans-serif;font-size:clamp(7px,1.6cqw,11px);letter-spacing:1.5px;color:#c4542a;display:block}
+.lb-c{font-family:'Bebas Neue',sans-serif;font-size:clamp(7px,1.6cqw,11px);letter-spacing:1px;color:#f5f0e8;display:block}
+.lb-l{font-size:clamp(5px,1cqw,8px);letter-spacing:3px;color:rgba(245,240,232,0.25);display:block;margin-top:1px}
+.dots{display:flex;gap:5px;z-index:2}
+.dot{width:6px;height:6px;border-radius:50%}
+
+/* Right panel */
+.rp{
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:5% 5% 4%;z-index:1;min-width:0;overflow:hidden;
+}
+.rp-ey{font-size:clamp(5px,1cqw,7px);letter-spacing:2px;text-transform:uppercase;color:rgba(0,255,136,0.6);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp-nm{font-family:'Bebas Neue',sans-serif;font-size:clamp(11px,2.6cqw,19px);letter-spacing:1px;line-height:1;color:#f5f0e8}
+.rp-nm .r{color:#c4542a}
+.rp-tg{font-size:clamp(4px,0.9cqw,6.5px);letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.25);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.div{height:1px;background:linear-gradient(90deg,rgba(196,84,42,0.4),transparent);margin:4px 0}
+
+/* Contacts */
+.cts{display:flex;flex-direction:column;gap:3px}
+.ct{display:flex;align-items:center;gap:5px;text-decoration:none;cursor:pointer;padding:2px 3px;border-radius:3px;border:1px solid transparent;transition:all 0.15s;min-width:0}
+.ct:hover,.ct:active{background:rgba(196,84,42,0.09);border-color:rgba(196,84,42,0.3)}
+.ci{width:clamp(13px,2.2cqw,17px);height:clamp(13px,2.2cqw,17px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:clamp(4px,0.9cqw,6.5px);flex-shrink:0;font-weight:700;color:#fff;font-family:sans-serif}
+.cl{font-size:clamp(4px,0.8cqw,6px);letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.28);min-width:clamp(22px,3.5cqw,36px);flex-shrink:0}
+.cv{font-size:clamp(5px,1.1cqw,8px);color:#f5f0e8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+
+/* Tags */
+.tgs{display:flex;gap:3px;overflow:hidden}
+.tg{font-size:clamp(3px,0.7cqw,5.5px);letter-spacing:1px;text-transform:uppercase;padding:1.5px 4px;border-radius:2px;border:1px solid;white-space:nowrap;flex-shrink:0}
+
+/* Flip hint */
+.fh{background:rgba(245,240,232,0.02);border-top:1px solid rgba(196,84,42,0.1);display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:background 0.2s}
+.fh:hover{background:rgba(196,84,42,0.07)}
+.fh p{font-size:clamp(5px,1cqw,7px);letter-spacing:2px;text-transform:uppercase;color:rgba(245,240,232,0.2)}
+.sp{animation:spin 6s linear infinite;display:inline-block;font-size:clamp(5px,1cqw,8px);color:rgba(245,240,232,0.2)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══════ BACK ═══════ */
+.back-face{
+  background:#0d0a06;
+  display:grid;grid-template-rows:4px 1fr 16px;
+}
+.back-stripe{background:linear-gradient(90deg,#00ff88 0%,#00e5ff 25%,#7c3aed 50%,#ff2d78 75%,#c4542a 100%)}
+.bc{display:grid;grid-template-columns:28% 1fr;position:relative;overflow:hidden}
+.bc::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(196,84,42,0.06) 1px,transparent 1px);background-size:18px 18px;pointer-events:none;z-index:0}
+.bl{background:#1a0f05;border-right:1px solid rgba(196,84,42,0.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:6% 4%;z-index:1}
+.blv{width:44%;aspect-ratio:1}
+.blv video{width:100%;height:100%;object-fit:contain;border-radius:4px;display:block}
+.blt{font-family:'Bebas Neue',sans-serif;font-size:clamp(7px,1.5cqw,11px);letter-spacing:1px;color:#f5f0e8;text-align:center;line-height:1.2}
+.blt em{color:#c4542a;font-style:normal}
+.bln{font-size:clamp(4px,0.85cqw,6.5px);letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.28);text-align:center;line-height:1.6}
+.badge{display:flex;align-items:center;gap:3px;background:rgba(0,255,136,0.07);border:1px solid rgba(0,255,136,0.18);border-radius:3px;padding:2px 5px}
+.bdot{width:4px;height:4px;border-radius:50%;background:#00ff88;animation:bdPulse 2s ease-in-out infinite}
+@keyframes bdPulse{0%,100%{opacity:1}50%{opacity:0.1}}
+.badge span{font-size:clamp(4px,0.8cqw,6px);letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,255,136,0.65)}
+.br{display:flex;flex-direction:column;padding:5% 5% 4%;gap:4%;z-index:1;overflow:hidden}
+.fl{font-size:clamp(4px,0.8cqw,6px);letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.28);display:block;margin-bottom:2px}
+.fi,.fs,.ft{width:100%;background:rgba(245,240,232,0.05);border:1px solid rgba(196,84,42,0.2);border-radius:3px;color:#f5f0e8;font-family:'Space Mono',monospace;font-size:clamp(6px,1.1cqw,9px);padding:3px 5px;outline:none;transition:border-color 0.15s;-webkit-appearance:none}
+.fi:focus,.fs:focus,.ft:focus{border-color:#c4542a}
+.fs option{background:#0d0a06;color:#f5f0e8}
+.ft{resize:none;min-height:26px;line-height:1.4;flex:1}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.fg{display:flex;flex-direction:column;gap:1.5px}
+.fb{width:100%;background:#c4542a;border:none;color:#f5f0e8;font-family:'Bebas Neue',sans-serif;font-size:clamp(8px,1.5cqw,13px);letter-spacing:2px;padding:4px;border-radius:3px;cursor:pointer;transition:background 0.2s;margin-top:2px}
+.fb:hover{background:#ff2d78}
+.fok{display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px}
+.fok-i{font-size:clamp(14px,3cqw,22px)}
+.fok-t{font-family:'Bebas Neue',sans-serif;font-size:clamp(10px,2cqw,16px);letter-spacing:2px;color:#00ff88}
+.fok-s{font-size:clamp(5px,0.9cqw,7px);color:rgba(245,240,232,0.35);line-height:1.7}
+.bh{background:rgba(245,240,232,0.02);border-top:1px solid rgba(196,84,42,0.1);display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:background 0.2s}
+.bh:hover{background:rgba(196,84,42,0.07)}
+.bh p{font-size:clamp(5px,1cqw,7px);letter-spacing:2px;text-transform:uppercase;color:rgba(245,240,232,0.2)}
+
+/* Buttons below paper */
+.ctrls{display:flex;gap:10px}
+.cbtn{background:#fff;border:1px solid #ccc;border-radius:7px;padding:9px 22px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#888;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.07);transition:all 0.2s}
+.cbtn:hover{border-color:#c4542a;color:#c4542a}
+.cbtn.sh{background:#c4542a;color:#fff;border-color:#c4542a}
+.cbtn.sh:hover{background:#a02a10}
+.hint{font-size:9px;letter-spacing:1px;color:#888;text-align:center;line-height:2}
+
+/* Container query for responsive text sizing */
+#bcard{container-type:inline-size}
+
+*{cursor:none!important}
+#dc-cursor{position:fixed;pointer-events:none;z-index:9999;width:24px;height:24px;transform:translate(-50%,-50%)}
+#dc-cursor::before{content:'';position:absolute;width:1px;height:24px;left:50%;top:0;transform:translateX(-50%);background:var(--terracotta,#c4542a)}
+#dc-cursor::after{content:'';position:absolute;width:24px;height:1px;top:50%;left:0;transform:translateY(-50%);background:var(--terracotta,#c4542a)}
+#dc-diamond{position:fixed;pointer-events:none;z-index:9998;width:10px;height:10px;background:var(--terracotta,#c4542a);transform:translate(-50%,-50%) rotate(45deg);transition:width .15s,height .15s;opacity:.85}
+
+</style>
+</head>
+<body>
+<div id="dc-cursor"></div><div id="dc-diamond"></div>
+
+<!-- ══════ INTRO ══════ -->
+<div id="intro">
+  <div class="intro-vid">
+    <div class="intro-glow"></div>
+    <video src="seedance-logo.mp4" autoplay muted loop playsinline></video>
+  </div>
+  <div class="intro-name"><span>Drawing</span><br>Conclusions LLC</div>
+  <div class="intro-bar"><div class="intro-bar-fill"></div></div>
+  <button class="intro-skip" onclick="skipIntro()">Skip →</button>
+</div>
+
+<!-- ══════ WHITE PAPER ══════ -->
+<div id="paper">
+  <p class="paper-label">Business Card · 3.5 × 2 inches</p>
+
+  <!-- THE CARD -->
+  <div id="bcard">
+
+    <!-- FRONT -->
+    <div class="face front">
+      <div class="top-stripe"></div>
+      <div class="front-content">
+
+        <div class="lp">
+          <div class="lv">
+            <div class="lv-glow"></div>
+            <video src="seedance-logo.mp4" autoplay muted loop playsinline></video>
+            <div class="lv-ring"></div>
+          </div>
+          <div class="lb">
+            <span class="lb-d">DRAWING</span>
+            <span class="lb-c">CONCLUSIONS</span>
+            <span class="lb-l">L &nbsp; L &nbsp; C</span>
+          </div>
+          <div class="dots">
+            <div class="dot" style="background:#c4542a"></div>
+            <div class="dot" style="background:#7c3aed"></div>
+            <div class="dot" style="background:#00ff88"></div>
+            <div class="dot" style="background:#ff2d78"></div>
+          </div>
+        </div>
+
+        <div class="rp">
+          <div>
+            <p class="rp-ey">✦ Art Studio &amp; Creative Services</p>
+            <p class="rp-nm"><span class="r">Drawing</span> Conclusions LLC</p>
+            <p class="rp-tg">Bold Art · Fearless Creativity · Work That Speaks</p>
+          </div>
+          <div class="div"></div>
+          <div class="cts">
+            <a class="ct" href="tel:8572561659">
+              <div class="ci" style="background:#c4542a">☎</div>
+              <span class="cl">Phone</span><span class="cv">(857) 256-1659</span>
+            </a>
+            <div class="ct" onclick="document.getElementById('bcard').classList.add('flipped')">
+              <div class="ci" style="background:#7c3aed">@</div>
+              <span class="cl">Email</span><span class="cv">drawingconclusionsrfi@gmail.com</span>
+            </div>
+            <a class="ct" href="https://cash.app/$DCRProdpay" target="_blank">
+              <div class="ci" style="background:#00ff88;color:#0d0a06">$</div>
+              <span class="cl">CashApp</span><span class="cv">$DCRProdpay</span>
+            </a>
+            <a class="ct" href="https://instagram.com/drawingconclusions2020" target="_blank">
+              <div class="ci" style="background:#ff2d78">IG</div>
+              <span class="cl">Insta</span><span class="cv">@drawingconclusions2020</span>
+            </a>
+            <a class="ct" href="https://drawingconclusionsrfi-cyber.github.io/drawing-conclusions" target="_blank">
+              <div class="ci" style="background:#d4920a;color:#0d0a06">DC</div>
+              <span class="cl">Web</span><span class="cv">drawingconclusionsrfi-cyber.github.io/drawing-conclusions</span>
+            </a>
+          </div>
+          <div class="div"></div>
+          <div class="tgs">
+            <span class="tg" style="color:#c4542a;border-color:rgba(196,84,42,0.35)">Graphic Design</span>
+            <span class="tg" style="color:#7c3aed;border-color:rgba(124,58,237,0.35)">Commissions</span>
+            <span class="tg" style="color:#00e5ff;border-color:rgba(0,229,255,0.35)">Merch</span>
+            <span class="tg" style="color:#ff2d78;border-color:rgba(255,45,120,0.35)">Original Art</span>
+          </div>
+        </div>
+
+      </div>
+      <div class="fh" onclick="document.getElementById('bcard').classList.add('flipped')">
+        <span class="sp">⟳</span><p>Flip to send a message</p>
+      </div>
+    </div>
+
+    <!-- BACK -->
+    <div class="face face-back back-face">
+      <div class="back-stripe"></div>
+      <div class="bc">
+        <div class="bl">
+          <div class="blv"><video src="seedance-logo.mp4" autoplay muted loop playsinline></video></div>
+          <p class="blt"><em>Drawing</em><br>Conclusions<br>LLC</p>
+          <p class="bln">Message goes<br>to our inbox</p>
+          <div class="badge"><div class="bdot"></div><span>Live Inbox</span></div>
+        </div>
+        <div class="br">
+          <form id="cForm" action="https://formspree.io/f/xdayjjdp" method="POST" style="display:flex;flex-direction:column;gap:4px;flex:1">
+            <div class="fr">
+              <div class="fg"><label class="fl">Name</label><input class="fi" type="text" name="name" placeholder="Your name" required></div>
+              <div class="fg"><label class="fl">Phone</label><input class="fi" type="tel" name="phone" placeholder="(555) 000"></div>
+            </div>
+            <div class="fg"><label class="fl">Email</label><input class="fi" type="email" name="email" placeholder="your@email.com" required></div>
+            <div class="fg"><label class="fl">Service</label>
+              <select class="fs" name="subject">
+                <option value="">Select...</option>
+                <option>Graphic Design</option>
+                <option>Art Commission</option>
+                <option>Custom Merch</option>
+                <option>Original Artwork</option>
+                <option>General Inquiry</option>
+              </select>
+            </div>
+            <div class="fg" style="flex:1;display:flex;flex-direction:column"><label class="fl">Message</label><textarea class="ft" name="message" placeholder="Your project..." style="flex:1" required></textarea></div>
+            <button class="fb" type="submit">Send Message →</button>
+          </form>
+          <div class="fok" id="fOk">
+            <div class="fok-i">✓</div>
+            <p class="fok-t">Sent!</p>
+            <p class="fok-s">I'll reply within 24 hours.</p>
+          </div>
+        </div>
+      </div>
+      <div class="bh" onclick="document.getElementById('bcard').classList.remove('flipped')">
+        <p>⟵ Back to card</p>
+      </div>
+    </div>
+
+  </div><!-- /bcard -->
+
+  <div class="ctrls">
+    <button class="cbtn" onclick="document.getElementById('bcard').classList.toggle('flipped')">⟳ Flip</button>
+    <button class="cbtn sh" onclick="shareCard()">⬆ Share</button>
+  </div>
+</div>
+
+<p class="hint">Tap phone to call · Tap email row to message · Tap ⟳ to flip</p>
+
+<script>
+// Auto dismiss intro after 3 seconds
+setTimeout(skipIntro, 3000);
+function skipIntro(){
+  document.getElementById('intro').classList.add('gone');
+}
+
+// Form
+document.getElementById('cForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  const btn=this.querySelector('.fb');
+  btn.textContent='Sending...';btn.disabled=true;
+  try{
+    const r=await fetch(this.action,{method:'POST',body:new FormData(this),headers:{'Accept':'application/json'}});
+    if(r.ok){this.style.display='none';document.getElementById('fOk').style.display='flex';}
+    else{btn.textContent='Try Again';btn.disabled=false;}
+  }catch{btn.textContent='Try Again';btn.disabled=false;}
+});
+
+// Share
+function shareCard(){
+  if(navigator.share){
+    navigator.share({title:'Drawing Conclusions LLC',text:'Digital Business Card',url:window.location.href}).catch(()=>{});
+  } else {
+    navigator.clipboard?.writeText(window.location.href).then(()=>{
+      const b=document.querySelector('.cbtn.sh');
+      b.textContent='✓ Copied!';setTimeout(()=>{b.textContent='⬆ Share';},2500);
+    });
+  }
+}
+
+// Desktop tilt
+const bc=document.getElementById('bcard');
+bc.addEventListener('mousemove',e=>{
+  if(bc.classList.contains('flipped'))return;
+  const r=bc.getBoundingClientRect();
+  const x=(e.clientX-r.left)/r.width-0.5;
+  const y=(e.clientY-r.top)/r.height-0.5;
+  bc.style.transform=`rotateY(${x*8}deg) rotateX(${-y*5}deg)`;
+});
+bc.addEventListener('mouseleave',()=>{
+  if(!bc.classList.contains('flipped'))bc.style.transform='';
+});
+</script>
+<script>(function(){var c=document.getElementById('dc-cursor'),d=document.getElementById('dc-diamond');if(!c||!d)return;document.addEventListener('mousemove',function(e){c.style.left=e.clientX+'px';c.style.top=e.clientY+'px';d.style.left=e.clientX+'px';d.style.top=e.clientY+'px';});document.querySelectorAll('a,button').forEach(function(el){el.addEventListener('mouseenter',function(){d.style.width='16px';d.style.height='16px';d.style.opacity='1';});el.addEventListener('mouseleave',function(){d.style.width='10px';d.style.height='10px';d.style.opacity='.85';});});})()</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+DRAWING CONCLUSIONS — SITE FILES (FLAT VERSION)
+=================================================
+
+WHY THIS IS DIFFERENT:
+This package has NO folders. Every file sits at the same level.
+That means the drag-and-drop CANNOT break anymore - there is no
+folder structure to lose.
+
+HOW TO PUT IT ONLINE:
+  1. Unzip this file. You get a folder "drawing-conclusions"
+     containing a flat pile of files (HTML, images, videos, PDFs).
+  2. In your GitHub repo, click "Add file" > "Upload files".
+  3. OPEN the drawing-conclusions folder, select EVERY file inside
+     (Ctrl+A selects all), and drag them all onto GitHub.
+  4. Click "Commit changes". Wait 2-3 minutes.
+  5. Hard-refresh your site: Ctrl+Shift+R.
+
+THAT IS IT. Because there are no folders, it does not matter how
+you drag - flat files always land correctly.
+
+TIP: If you ever delete the old repo and start fresh, after
+uploading go to Settings > Pages and set Source to
+"Deploy from a branch" > main > / (root) > Save.
+
+YOUR PAGES:
+  index.html .......... homepage
+  portfolio.html ...... portfolio & store
+  personal.html ....... personal site
+  card.html ........... digital business card
+  flyer.html .......... digital flyer
+  admin.html, dc-studio-hub.html, depthworld.html ... extra pages

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Drawing Conclusions — The Artist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Barlow+Condensed:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --paper:#f2ede4;
+  --dark:#0e0c09;
+  --rust:#b84c2a;
+  --clay:#9a6240;
+  --sand:#c9a97a;
+  --moss:#4a6741;
+  --neon:#e8ff47;
+  --violet:#5b2d8e;
+  --ink-dark:#1a1510;
+  --muted:rgba(14,12,9,0.45);
+}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--dark);font-family:'DM Mono',monospace;overflow-x:hidden;cursor:none}
+.cur{position:fixed;width:10px;height:10px;background:var(--rust);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.08s;top:0;left:0}
+.cur-trail{position:fixed;width:28px;height:28px;border:1px solid var(--rust);border-radius:50%;pointer-events:none;z-index:9998;transition:all 0.18s ease;opacity:0.5;top:0;left:0}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:1.25rem 3rem;display:flex;justify-content:space-between;align-items:center}
+.nav-name{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.1rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--dark);text-decoration:none}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;transition:color 0.2s}
+.nav-links a:hover{color:var(--rust)}
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr}
+@media(max-width:800px){.hero{grid-template-columns:1fr}}
+.hero-left{background:var(--dark);display:flex;flex-direction:column;justify-content:flex-end;padding:6rem 3rem 4rem;position:relative;overflow:hidden;min-height:100vh}
+.hl-texture{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(184,76,42,0.04) 0px,rgba(184,76,42,0.04) 1px,transparent 1px,transparent 12px);background-size:18px 18px;pointer-events:none}
+.hl-accent{position:absolute;bottom:0;left:0;width:200px;height:200px;background:radial-gradient(circle,rgba(184,76,42,0.3) 0%,transparent 70%);pointer-events:none}
+.hl-accent2{position:absolute;top:30%;right:-50px;width:300px;height:300px;background:radial-gradient(circle,rgba(91,45,142,0.2) 0%,transparent 70%);pointer-events:none}
+.hero-left-content{position:relative;z-index:1}
+.hero-eyebrow{font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(232,255,71,0.7);margin-bottom:1.5rem}
+.hero-name{font-family:'Playfair Display',serif;font-size:clamp(3rem,5vw,5.5rem);line-height:1.05;color:var(--paper);margin-bottom:1rem;font-style:italic}
+.hero-name em{font-style:normal;color:var(--rust);display:block}
+.hero-title-tag{display:inline-flex;align-items:center;gap:0.5rem;border:1px solid rgba(232,255,71,0.25);padding:0.4rem 1rem;border-radius:2px;margin-bottom:2rem}
+.hero-title-tag span{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(232,255,71,0.6)}
+.hero-bio-short{font-size:0.78rem;color:rgba(242,237,228,0.45);line-height:1.9;max-width:340px;margin-bottom:2.5rem}
+.hero-ctas{display:flex;gap:1rem}
+.cta-solid{background:var(--rust);color:var(--paper);padding:0.75rem 2rem;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.9rem;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:all 0.2s;display:inline-block}
+.cta-solid:hover{background:var(--neon);color:var(--dark)}
+.cta-outline{border:1px solid rgba(242,237,228,0.2);color:rgba(242,237,228,0.6);padding:0.75rem 2rem;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.9rem;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:all 0.2s;display:inline-block}
+.cta-outline:hover{border-color:var(--neon);color:var(--neon)}
+.hero-right{background:var(--paper);display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;overflow:hidden;padding:6rem 3rem 3rem;min-height:100vh}
+.hr-dots{position:absolute;inset:0;background-image:radial-gradient(circle,rgba(14,12,9,0.08) 1px,transparent 1px);background-size:24px 24px;pointer-events:none}
+.hr-block{position:absolute;bottom:0;right:0;width:200px;height:200px;background:var(--rust);opacity:0.08;pointer-events:none}
+.portrait-frame{position:relative;z-index:1;width:min(320px,80%);border:1px solid rgba(14,12,9,0.12)}
+.portrait-inner{width:100%;aspect-ratio:3/4;background:linear-gradient(160deg,rgba(184,76,42,0.15) 0%,rgba(154,98,64,0.1) 50%,rgba(91,45,142,0.1) 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;position:relative}
+.portrait-placeholder{opacity:0.3;display:flex;flex-direction:column;align-items:center;gap:0.75rem}
+.portrait-placeholder svg{width:70px;height:70px}
+.portrait-placeholder span{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--dark)}
+.portrait-corner{position:absolute;width:20px;height:20px;border-color:var(--rust);border-style:solid;opacity:0.6}
+.pc-tl{top:-1px;left:-1px;border-width:2px 0 0 2px}
+.pc-tr{top:-1px;right:-1px;border-width:2px 2px 0 0}
+.pc-bl{bottom:-1px;left:-1px;border-width:0 0 2px 2px}
+.pc-br{bottom:-1px;right:-1px;border-width:0 2px 2px 0}
+.portrait-caption{margin-top:1rem;font-size:0.62rem;letter-spacing:0.15em;color:var(--muted);text-align:center}
+.hero-counter{display:flex;gap:2.5rem;margin-top:2.5rem;z-index:1}
+.counter-item{text-align:center}
+.counter-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:2rem;color:var(--dark);line-height:1}
+.counter-label{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted)}
+.portrait-upload-btn{margin-top:1.25rem;background:transparent;border:1px solid rgba(14,12,9,0.2);color:var(--muted);font-family:'DM Mono',monospace;font-size:0.68rem;padding:0.5rem 1.25rem;border-radius:2px;cursor:pointer;transition:all 0.2s;z-index:1}
+.portrait-upload-btn:hover{border-color:var(--rust);color:var(--rust)}
+.marquee-strip{background:var(--dark);overflow:hidden;padding:1.25rem 0;border-top:1px solid rgba(184,76,42,0.2);border-bottom:1px solid rgba(184,76,42,0.2)}
+.marquee-inner{display:flex;gap:3rem;animation:marquee 20s linear infinite;white-space:nowrap;width:max-content}
+.marquee-inner:hover{animation-play-state:paused}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.marquee-item{font-family:'Barlow Condensed',sans-serif;font-weight:300;font-size:1.1rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(242,237,228,0.4)}
+.marquee-dot{color:var(--rust);font-size:1.5rem;line-height:1;vertical-align:middle}
+#about{background:var(--paper);padding:7rem 3rem;display:grid;grid-template-columns:1fr 1.2fr;gap:5rem;align-items:center}
+@media(max-width:800px){#about{grid-template-columns:1fr;gap:3rem}}
+.section-label{font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rust);margin-bottom:1rem}
+.about-h2{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,4vw,3.5rem);line-height:1.1;margin-bottom:1.5rem;font-weight:700}
+.about-text{font-size:0.82rem;line-height:2;color:rgba(14,12,9,0.6);margin-bottom:1.5rem}
+.about-signature{font-family:'Playfair Display',serif;font-style:italic;font-size:1.8rem;color:var(--rust);margin-top:2rem}
+.about-right{display:flex;flex-direction:column;gap:1.5rem}
+.value-item{border-left:2px solid var(--rust);padding:1rem 1.5rem;background:rgba(184,76,42,0.03);transition:background 0.2s}
+.value-item:hover{background:rgba(184,76,42,0.06)}
+.value-num{font-size:0.6rem;letter-spacing:0.2em;color:var(--rust);margin-bottom:0.35rem}
+.value-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.35rem}
+.value-desc{font-size:0.72rem;color:var(--muted);line-height:1.7}
+#process{background:var(--ink-dark);padding:7rem 3rem;color:var(--paper)}
+.process-label{font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(232,255,71,0.7);margin-bottom:1rem}
+.process-title{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,4vw,3.5rem);line-height:1.1;margin-bottom:3rem}
+.process-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem}
+@media(max-width:800px){.process-steps{grid-template-columns:1fr 1fr}}
+.step{padding-top:2rem;border-top:1px solid rgba(242,237,228,0.1);position:relative}
+.step::before{content:'';position:absolute;top:-1px;left:0;width:40px;height:1px;background:var(--rust)}
+.step-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:3rem;color:rgba(242,237,228,0.06);line-height:1;margin-bottom:1rem}
+.step-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.5rem}
+.step-desc{font-size:0.72rem;color:rgba(242,237,228,0.35);line-height:1.8}
+#featured{background:var(--paper);padding:7rem 3rem}
+.featured-label{font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--rust);margin-bottom:1rem}
+.featured-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:3rem}
+.featured-title{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,4vw,3.5rem);line-height:1.1}
+.featured-ext-link{font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--rust);text-decoration:none;border-bottom:1px solid var(--rust);padding-bottom:2px;transition:opacity 0.2s}
+.featured-ext-link:hover{opacity:0.6}
+.featured-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;grid-template-rows:auto auto;gap:1.5rem}
+@media(max-width:800px){.featured-grid{grid-template-columns:1fr}}
+.feat-card{background:var(--dark);overflow:hidden;position:relative;cursor:none;transition:transform 0.3s;border-radius:2px}
+.feat-card:hover{transform:scale(1.02)}
+.feat-card.large{grid-row:span 2}
+.feat-img{width:100%;display:flex;align-items:center;justify-content:center;min-height:200px;position:relative}
+.feat-card.large .feat-img{min-height:420px}
+.feat-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(14,12,9,0.9) 0%,transparent 50%);opacity:0;transition:opacity 0.3s}
+.feat-card:hover .feat-overlay{opacity:1}
+.feat-info{position:absolute;bottom:0;left:0;right:0;padding:1.25rem;transform:translateY(10px);opacity:0;transition:all 0.3s}
+.feat-card:hover .feat-info{transform:translateY(0);opacity:1}
+.feat-info h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--paper);margin-bottom:0.25rem;font-style:italic}
+.feat-info p{font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(242,237,228,0.5)}
+#philosophy{background:var(--rust);padding:7rem 3rem;text-align:center;position:relative;overflow:hidden}
+.phil-bg{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,rgba(242,237,228,0.04) 0px,rgba(242,237,228,0.04) 1px,transparent 1px,transparent 40px);pointer-events:none}
+.phil-deco{font-family:'Playfair Display',serif;font-size:8rem;color:rgba(242,237,228,0.08);line-height:1;position:absolute;top:-1rem;left:2rem;font-style:italic;pointer-events:none}
+.phil-content{position:relative;z-index:1;max-width:700px;margin:0 auto}
+.phil-quote{font-family:'Playfair Display',serif;font-size:clamp(1.5rem,3vw,2.5rem);line-height:1.4;color:var(--paper);font-style:italic;margin-bottom:2rem}
+.phil-attr{font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(242,237,228,0.5)}
+#contact{background:var(--paper);padding:7rem 3rem;display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start}
+@media(max-width:800px){#contact{grid-template-columns:1fr}}
+.contact-left p{font-size:0.78rem;color:var(--muted);line-height:2;margin-bottom:2.5rem}
+.contact-links{display:flex;flex-direction:column;gap:1rem}
+.contact-link{display:flex;align-items:center;gap:1rem;text-decoration:none;color:var(--dark);padding:1rem 1.25rem;border:1px solid rgba(14,12,9,0.1);border-radius:2px;transition:all 0.2s}
+.contact-link:hover{border-color:var(--rust);background:rgba(184,76,42,0.04)}
+.cl-icon{width:36px;height:36px;background:var(--rust);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85rem;color:var(--paper);flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-weight:700}
+.cl-label{font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:0.15rem;font-family:'DM Mono',monospace}
+.cl-text-val{font-size:0.78rem;font-family:'DM Mono',monospace}
+.contact-form-card{background:var(--dark);padding:2.5rem;border-radius:3px}
+.cf-label{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(242,237,228,0.35);margin-bottom:0.4rem;display:block;margin-top:1.25rem}
+.cf-label:first-child{margin-top:0}
+.cf-input,.cf-textarea{width:100%;background:rgba(242,237,228,0.04);border:1px solid rgba(242,237,228,0.1);border-radius:2px;color:var(--paper);font-family:'DM Mono',monospace;font-size:0.78rem;padding:0.75rem 1rem;outline:none;transition:border-color 0.2s}
+.cf-input:focus,.cf-textarea:focus{border-color:var(--rust)}
+.cf-textarea{min-height:100px;resize:vertical;line-height:1.6}
+.cf-submit{width:100%;margin-top:1.5rem;background:var(--rust);border:none;color:var(--paper);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;letter-spacing:0.2em;text-transform:uppercase;padding:1rem;border-radius:2px;cursor:pointer;transition:all 0.2s}
+.cf-submit:hover{background:var(--neon);color:var(--dark)}
+footer.personal-footer{background:var(--dark);color:var(--paper);padding:2.5rem 3rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;border-top:1px solid rgba(184,76,42,0.2)}
+.fp-copy{font-size:0.65rem;letter-spacing:0.12em;color:rgba(242,237,228,0.25)}
+.fp-brand{font-family:'Playfair Display',serif;font-style:italic;color:var(--rust);font-size:1.2rem;text-decoration:none}
+.fp-links{display:flex;gap:2rem}
+.fp-links a{font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(242,237,228,0.3);text-decoration:none;transition:color 0.2s}
+.fp-links a:hover{color:var(--neon)}
+.fade{opacity:0;transform:translateY(24px);transition:opacity 0.7s ease,transform 0.7s ease}
+.fade.visible{opacity:1;transform:translateY(0)}
+
+/* ══════════════════════════════
+   MOBILE RESPONSIVE — 720px and below
+   Moto G Play optimized
+══════════════════════════════ */
+@media(max-width:768px){
+
+  /* Hide custom cursor on touch */
+  .cursor, .cursor-ring, .cur, .cur-trail { display:none !important }
+
+  /* NAV */
+  nav {
+    padding:0.85rem 1rem;
+    flex-wrap:nowrap;
+    gap:0.5rem;
+    overflow:hidden;
+  }
+  .nav-links {
+    display:none;
+  }
+  .logo { font-size:1.1rem; }
+  .nav-cta {
+    font-size:0.62rem;
+    padding:0.4rem 0.85rem;
+    white-space:nowrap;
+  }
+
+  /* SECTIONS */
+  section { padding:3.5rem 1.25rem; }
+
+  /* SECTION TITLES */
+  .section-title { font-size:2.2rem; margin-bottom:1.5rem; }
+  .section-label { font-size:0.6rem; }
+
+  /* BUTTONS */
+  .btn-primary, .btn-ghost {
+    padding:0.75rem 1.5rem;
+    font-size:0.95rem;
+    width:100%;
+    text-align:center;
+    display:block;
+  }
+  .hero-actions { flex-direction:column; gap:0.75rem; }
+}
+
+/* ── INDEX PAGE ── */
+@media(max-width:768px){
+  .hero {
+    padding:5rem 1.25rem 2rem;
+    justify-content:flex-start;
+    min-height:100vh;
+    overflow-y:auto;
+  }
+  .intro-video-wrap {
+    width:min(260px,75vw);
+    height:min(260px,75vw);
+    margin-bottom:1.25rem;
+  }
+  .hero-video-wrap {
+    width:min(220px,65vw);
+    height:min(220px,65vw);
+    margin-bottom:1.25rem;
+  }
+  .hero-title { font-size:2.8rem; }
+  .hero-label { font-size:0.58rem; }
+  .hero-sub { font-size:0.68rem; }
+  .cards {
+    grid-template-columns:1fr;
+    gap:1rem;
+    width:100%;
+    max-width:100%;
+  }
+  .card { padding:1.25rem 1rem; }
+  .card-title { font-size:1.3rem; }
+  .card-desc { font-size:0.6rem; }
+  .intro-title { font-size:1.8rem; }
+  .intro-label { font-size:0.58rem; }
+}
+
+/* ── PORTFOLIO PAGE ── */
+@media(max-width:768px){
+  /* Hero */
+  .hero { padding:6rem 1.25rem 3rem; min-height:auto; }
+  .hero-title .line1,
+  .hero-title .line2 { font-size:3.5rem; }
+  .hero-title .line3 { font-size:2rem; }
+  .hero-sub { font-size:0.7rem; max-width:100%; }
+
+  /* Gallery tabs */
+  .gallery-tabs { overflow-x:auto; width:100%; border-radius:3px; }
+  .tab-btn { font-size:0.62rem; padding:0.55rem 1rem; white-space:nowrap; }
+  .gallery-grid {
+    grid-template-columns:1fr 1fr;
+    gap:0.75rem;
+  }
+
+  /* Sketches */
+  .sketches-grid {
+    grid-template-columns:1fr 1fr;
+    gap:0.75rem;
+  }
+
+  /* Merch */
+  .merch-categories {
+    overflow-x:auto;
+    flex-wrap:nowrap;
+    padding-bottom:0.5rem;
+    gap:0.5rem;
+    -webkit-overflow-scrolling:touch;
+  }
+  .merch-cat {
+    white-space:nowrap;
+    font-size:0.6rem;
+    padding:0.4rem 0.85rem;
+    flex-shrink:0;
+  }
+  .merch-carousel-wrap { gap:0.5rem; }
+  .carousel-btn {
+    width:36px;height:36px;
+    font-size:0.9rem;
+    flex-shrink:0;
+  }
+  .carousel-track .merch-card {
+    flex:0 0 calc(100% - 0px);
+    min-width:unset;
+  }
+
+  /* Services */
+  .services-grid { grid-template-columns:1fr; gap:1.25rem; }
+  .service-name { font-size:1.5rem; }
+  .service-price { font-size:1.6rem; }
+
+  /* Booking form */
+  .booking-form { padding:1.5rem 1rem; }
+  .form-row { grid-template-columns:1fr; gap:0; }
+
+  /* Contact section */
+  #contact > .fade-up > div {
+    grid-template-columns:1fr !important;
+    gap:2rem !important;
+  }
+
+  /* AI Chat */
+  .chat-container { max-width:100%; }
+  .chat-messages { min-height:200px; max-height:260px; }
+  .quick-actions { gap:0.4rem; }
+  .quick-btn { font-size:0.55rem; padding:0.25rem 0.6rem; }
+
+  /* Upload areas */
+  .upload-area { padding:1.5rem 1rem; }
+  .upload-text { font-size:0.68rem; }
+
+  /* Footer */
+  footer { padding:2rem 1.25rem 1.5rem; }
+  .footer-grid {
+    grid-template-columns:1fr;
+    gap:1.5rem;
+  }
+  .footer-bottom {
+    flex-direction:column;
+    align-items:flex-start;
+    gap:0.75rem;
+  }
+
+  /* Nav animated logo */
+  nav > div:last-child { display:none; }
+
+  /* Pay badges */
+  .pay-badges { justify-content:flex-start; }
+
+  /* Design/Commission sample grids */
+  #design-samples .gallery-grid,
+  #commission-samples .gallery-grid {
+    grid-template-columns:1fr 1fr;
+    gap:0.75rem;
+  }
+}
+
+/* ── PERSONAL PAGE ── */
+@media(max-width:768px){
+  /* Hero split becomes single column */
+  .hero { grid-template-columns:1fr !important; }
+  .hero-left {
+    min-height:auto;
+    padding:5rem 1.25rem 3rem;
+  }
+  .hero-right {
+    min-height:auto;
+    padding:2rem 1.25rem 3rem;
+  }
+  .hero-name { font-size:2.8rem; }
+  .hero-bio-short { font-size:0.72rem; max-width:100%; }
+  .hero-ctas { flex-direction:column; gap:0.75rem; }
+  .cta-solid, .cta-outline {
+    width:100%;
+    text-align:center;
+    display:block;
+  }
+  .portrait-frame { width:min(260px,75vw); }
+  .hero-counter { gap:1.5rem; }
+  .counter-num { font-size:1.6rem; }
+  .portrait-upload-btn { font-size:0.62rem; padding:0.45rem 1rem; }
+
+  /* About */
+  #about {
+    grid-template-columns:1fr !important;
+    gap:2.5rem;
+    padding:3.5rem 1.25rem;
+  }
+  .about-h2 { font-size:2rem; }
+
+  /* Process */
+  .process-steps {
+    grid-template-columns:1fr 1fr;
+    gap:1.5rem;
+  }
+  .process-title { font-size:2rem; }
+
+  /* Featured grid */
+  .featured-grid {
+    grid-template-columns:1fr !important;
+    grid-template-rows:auto !important;
+  }
+  .feat-card.large { grid-row:span 1 !important; }
+  .feat-card.large .feat-img { min-height:260px !important; }
+  .feat-card .feat-img { min-height:180px !important; }
+  .featured-header {
+    flex-direction:column;
+    align-items:flex-start;
+    gap:0.75rem;
+  }
+  .featured-title { font-size:2rem; }
+
+  /* Philosophy */
+  #philosophy { padding:4rem 1.25rem; }
+  .phil-quote { font-size:1.3rem; }
+  .phil-deco { font-size:4rem; }
+
+  /* Contact */
+  #contact {
+    grid-template-columns:1fr !important;
+    gap:2rem;
+    padding:3.5rem 1.25rem;
+  }
+  .contact-form-card { padding:1.5rem 1rem; }
+
+  /* Footer */
+  footer.personal-footer {
+    flex-direction:column;
+    align-items:flex-start;
+    gap:1rem;
+    padding:2rem 1.25rem;
+  }
+  .fp-links { gap:1.25rem; flex-wrap:wrap; }
+
+  /* Marquee */
+  .marquee-item { font-size:0.85rem; }
+}
+
+/* Touch-friendly tap targets */
+@media(max-width:768px){
+  a, button {
+    min-height:44px;
+    display:inline-flex;
+    align-items:center;
+  }
+  .nav-links a, .footer-col ul a, .fp-links a {
+    min-height:36px;
+  }
+  .card, .service-card, .gallery-card,
+  .sketch-card, .merch-card { cursor:pointer; }
+}
+
+
+@media(max-width:768px){
+  .hamburger{
+    display:flex;flex-direction:column;
+    justify-content:center;gap:5px;
+    width:40px;height:40px;
+    background:transparent;border:none;
+    cursor:pointer;padding:0.25rem;
+    flex-shrink:0;
+  }
+  .hamburger span{
+    display:block;width:24px;height:2px;
+    background:var(--cream);border-radius:2px;
+    transition:all 0.25s;
+  }
+  .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .hamburger.open span:nth-child(2){opacity:0}
+  .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .mobile-nav{
+    position:fixed;top:0;right:-100%;
+    width:75vw;max-width:280px;height:100vh;
+    background:var(--warm-dark,#1a0f05);
+    border-left:1px solid rgba(196,84,42,0.2);
+    z-index:999;
+    transition:right 0.3s ease;
+    display:flex;flex-direction:column;
+    padding:5rem 2rem 2rem;
+    gap:1.5rem;
+  }
+  .mobile-nav.open{ right:0; }
+  .mobile-nav a{
+    color:rgba(245,240,232,0.7);
+    text-decoration:none;
+    font-family:'Space Mono',monospace;
+    font-size:0.82rem;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    padding:0.75rem 0;
+    border-bottom:1px solid rgba(196,84,42,0.1);
+    transition:color 0.2s;
+    min-height:auto;
+    display:block;
+  }
+  .mobile-nav a:hover{ color:var(--cream); }
+  .mobile-nav-close{
+    position:absolute;top:1.25rem;right:1.25rem;
+    background:transparent;border:none;
+    color:rgba(245,240,232,0.4);font-size:1.1rem;
+    cursor:pointer;
+  }
+  .mobile-nav-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,0.5);
+    z-index:998;display:none;
+  }
+  .mobile-nav-overlay.open{ display:block; }
+}
+@media(min-width:769px){
+  .hamburger{ display:none; }
+  .mobile-nav{ display:none; }
+  .mobile-nav-overlay{ display:none; }
+}
+
+</style>
+</head>
+<body>
+<div class="cur" id="cur"></div>
+<div class="cur-trail" id="curTrail"></div>
+
+<nav>
+  <a class="nav-name" href="#home">Drawing Conclusions</a>
+  <ul class="nav-links">
+    <li><a href="https://drawingconclusionsrfi-cyber.github.io/drawing-conclusions/index.html">⌂ Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#featured">Work</a></li>
+    <li><a href="#philosophy">Philosophy</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  <div class="mobile-nav" id="mobileNav">
+    <button class="mobile-nav-close" onclick="toggleMenu()">✕</button>
+    <a href="https://drawingconclusionsrfi-cyber.github.io/drawing-conclusions/index.html" onclick="toggleMenu()">⌂ Home</a>
+    <a href="#about" onclick="toggleMenu()">About</a>
+    <a href="#process" onclick="toggleMenu()">Process</a>
+    <a href="#featured" onclick="toggleMenu()">Work</a>
+    <a href="#philosophy" onclick="toggleMenu()">Philosophy</a>
+    <a href="#contact" onclick="toggleMenu()">Contact</a>
+  </div>
+  <div class="mobile-nav-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+</nav>
+
+<section class="hero" id="home">
+  <div class="hero-left">
+    <div class="hl-texture"></div>
+    <div class="hl-accent"></div>
+    <div class="hl-accent2"></div>
+    <div class="hero-left-content">
+      <p class="hero-eyebrow">✦ Visual Artist · Graphic Designer</p>
+      <h1 class="hero-name">
+        The Artist<br>
+        <em>Behind the</em>
+        <em style="color:rgba(232,255,71,0.9)">Conclusions.</em>
+      </h1>
+      <div class="hero-title-tag"><span>Drawing Conclusions LLC</span></div>
+      <p class="hero-bio-short">Bold lines. Raw color. Unapologetic vision. I create art that doesn't ask permission — it makes statements, starts conversations, and refuses to be ignored.</p>
+      <div class="hero-ctas">
+        <a class="cta-solid" href="#about">My Story</a>
+        <a class="cta-outline" href="#featured">View Work</a>
+      </div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hr-dots"></div>
+    <div class="hr-block"></div>
+    <div class="portrait-frame" id="portraitFrame">
+      <div class="portrait-inner" id="portraitInner" style="padding:0;overflow:hidden">
+        <img
+          src="renford-reid-jr.jpg"
+          alt="Renford Reid Jr. — Drawing Conclusions LLC"
+          style="width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0"
+          onerror="this.style.display='none';document.getElementById('portraitFallback').style.display='flex'"
+        >
+        <div id="portraitFallback" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;flex-direction:column;gap:0.75rem;opacity:0.3">
+          <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="28" r="16" stroke="#0e0c09" stroke-width="1.5"/><path d="M10 72c0-16.569 13.431-30 30-30s30 13.431 30 30" stroke="#0e0c09" stroke-width="1.5"/></svg>
+          <span style="font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--dark)">Photo Loading...</span>
+        </div>
+        <div class="portrait-corner pc-tl"></div>
+        <div class="portrait-corner pc-tr"></div>
+        <div class="portrait-corner pc-bl"></div>
+        <div class="portrait-corner pc-br"></div>
+      </div>
+    </div>
+    <p class="portrait-caption">Renford Reid Jr. — Drawing Conclusions LLC</p>
+    <div class="hero-counter" id="heroCounter">
+      <div class="counter-item"><div class="counter-num" id="cnt1">0</div><div class="counter-label">Years Active</div></div>
+      <div class="counter-item"><div class="counter-num" id="cnt2">0</div><div class="counter-label">Works Created</div></div>
+      <div class="counter-item"><div class="counter-num" id="cnt3">0</div><div class="counter-label">Happy Clients</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <span class="marquee-item">Original Art</span><span class="marquee-dot"> · </span>
+    <span class="marquee-item">Bold Vision</span><span class="marquee-dot"> · </span>
+    <span class="marquee-item">Custom Commissions</span><span class="marquee-dot"> · </span>
+    <span class="marquee-item">Drawing Conclusions LLC</span><span class="marquee-dot"> · </span>
+    <span class="marquee-item">Graphic Design</span><span class="marquee-dot"> · </span>
+    <span class="marquee-item">Wearable Art</span><span class="marquee-dot"> · </span>
+    <span class="marquee-item">Original Art</span><span class="marquee-dot"> · </span>
+    <span class="marquee-item">Bold Vision</span><span class="marquee-dot"> · </span>
+    <span class="marquee-item">Custom Commissions</span><span class="marquee-dot"> · </span>
+    <span class="marquee-item">Drawing Conclusions LLC</span><span class="marquee-dot"> · </span>
+    <span class="marquee-item">Graphic Design</span><span class="marquee-dot"> · </span>
+    <span class="marquee-item">Wearable Art</span><span class="marquee-dot"> · </span>
+  </div>
+</div>
+
+<section id="about">
+  <div class="fade">
+    <p class="section-label">✦ 01 — The Person</p>
+    <h2 class="about-h2">Art That <em style="font-style:italic;color:var(--rust)">Speaks</em><br>Before You Do.</h2>
+    <p class="about-text">I've always believed that art isn't decoration — it's declaration. Every piece I create comes from a place of intention: a feeling that needed a home, a truth that deserved a form, a vision that refused to stay in my head.</p>
+    <p class="about-text">Drawing Conclusions started as a name that captured who I am — someone who observes, interprets, and then creates something from that understanding. Whether it's a graphic design project, an original painting, or a commission, I bring the same energy: full attention, full color, full commitment.</p>
+    <div class="about-signature">— Drawing Conclusions</div>
+  </div>
+  <div class="about-right fade">
+    <div class="value-item"><p class="value-num">01</p><p class="value-title">Intention Over Trends</p><p class="value-desc">Every creative decision is purposeful. No filler, no fluff — just work that means something.</p></div>
+    <div class="value-item"><p class="value-num">02</p><p class="value-title">Collaboration as Craft</p><p class="value-desc">When you commission me, you're not just hiring an artist — you're starting a creative partnership.</p></div>
+    <div class="value-item"><p class="value-num">03</p><p class="value-title">Color as Language</p><p class="value-desc">My palette isn't accidental. Color is how I communicate what words can't quite reach.</p></div>
+    <div class="value-item"><p class="value-num">04</p><p class="value-title">The Work Speaks First</p><p class="value-desc">I let the art do the talking. Everything else — the pitch, the bio — is just context.</p></div>
+  </div>
+</section>
+
+<section id="process">
+  <p class="process-label fade">✦ 02 — How I Work</p>
+  <h2 class="process-title fade">The <em style="font-style:italic;color:var(--rust)">Process</em></h2>
+  <div class="process-steps fade">
+    <div class="step"><div class="step-num">01</div><p class="step-name">Conversation</p><p class="step-desc">We start by talking. I need to understand your world before I can create in it.</p></div>
+    <div class="step"><div class="step-num">02</div><p class="step-name">Concepting</p><p class="step-desc">Sketches, color studies, rough ideas. I explore before I commit — so the final work is certain.</p></div>
+    <div class="step"><div class="step-num">03</div><p class="step-name">Creation</p><p class="step-desc">This is where I disappear into the work. Full focus. No distractions. Just making.</p></div>
+    <div class="step"><div class="step-num">04</div><p class="step-name">Delivery</p><p class="step-desc">Finished work, ready for your world. Physical or digital — it arrives exactly as promised.</p></div>
+  </div>
+</section>
+
+<section id="featured">
+  <p class="featured-label fade">✦ 03 — Selected Works</p>
+  <div class="featured-header fade">
+    <h2 class="featured-title">Recent <em style="font-style:italic;color:var(--rust)">Originals</em></h2>
+    <a class="featured-ext-link" href="https://drawingconclusionsrfi-cyber.github.io/drawing-conclusions/portfolio.html">View Full Portfolio →</a>
+  </div>
+  <div class="featured-grid fade">
+    <div class="feat-card large" style="background:linear-gradient(160deg,#2a1a0e,#4a1a0a)">
+      <div class="feat-img" style="min-height:420px;background:linear-gradient(135deg,rgba(184,76,42,0.3),rgba(91,45,142,0.3))">
+        <svg width="100" height="100" viewBox="0 0 100 100" fill="none" style="opacity:0.15"><circle cx="50" cy="50" r="40" stroke="white" stroke-width="1"/><path d="M20 70 Q35 30 50 50 Q65 70 80 30" stroke="white" stroke-width="1.5" fill="none"/></svg>
+      </div>
+      <div class="feat-overlay"></div>
+      <div class="feat-info"><h3>Urban Phantom I</h3><p>Original · Mixed Media · 2024</p></div>
+    </div>
+    <div class="feat-card" style="background:linear-gradient(135deg,#1a1505,#2a2010)">
+      <div class="feat-img" style="min-height:180px;background:linear-gradient(135deg,rgba(212,146,10,0.25),rgba(154,98,64,0.2))">
+        <svg width="60" height="60" viewBox="0 0 60 60" fill="none" style="opacity:0.15"><rect x="10" y="10" width="40" height="40" stroke="white" stroke-width="1"/><line x1="10" y1="30" x2="50" y2="30" stroke="white" stroke-width="1"/></svg>
+      </div>
+      <div class="feat-overlay"></div>
+      <div class="feat-info"><h3>Burn Season II</h3><p>Digital · 2024</p></div>
+    </div>
+    <div class="feat-card" style="background:linear-gradient(135deg,#080d14,#0d1520)">
+      <div class="feat-img" style="min-height:180px;background:linear-gradient(135deg,rgba(0,229,255,0.12),rgba(91,45,142,0.2))">
+        <svg width="60" height="60" viewBox="0 0 60 60" fill="none" style="opacity:0.15"><circle cx="30" cy="30" r="20" stroke="white" stroke-width="1"/><circle cx="30" cy="30" r="10" stroke="white" stroke-width="1"/></svg>
+      </div>
+      <div class="feat-overlay"></div>
+      <div class="feat-info"><h3>Neon Ancestor III</h3><p>Acrylic · 2023</p></div>
+    </div>
+    <div class="feat-card" style="background:linear-gradient(135deg,#0d0a14,#1a1020)">
+      <div class="feat-img" style="min-height:180px;background:linear-gradient(135deg,rgba(232,255,71,0.08),rgba(91,45,142,0.15))">
+        <svg width="60" height="60" viewBox="0 0 60 60" fill="none" style="opacity:0.12"><path d="M10 50 L30 10 L50 50Z" stroke="white" stroke-width="1" fill="none"/></svg>
+      </div>
+      <div class="feat-overlay"></div>
+      <div class="feat-info"><h3>Root Work V</h3><p>Ink on Paper · 2023</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="philosophy">
+  <div class="phil-bg"></div>
+  <div class="phil-deco">"</div>
+  <div class="phil-content fade">
+    <p class="phil-quote">"Every mark I make is a <strong style="font-style:normal;font-weight:700">conclusion</strong> — drawn from everything I've seen, felt, and refused to forget."</p>
+    <p class="phil-attr">— The Artist · Drawing Conclusions LLC</p>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="contact-left fade">
+    <p class="section-label">✦ 04 — Let's Connect</p>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(2.2rem,4vw,3.5rem);line-height:1.1;margin-bottom:1.5rem">Say <em style="font-style:italic;color:var(--rust)">Hello.</em></h2>
+    <p>Whether you have a project in mind, want to collaborate, or just want to talk about art — my inbox is always open. For commissions and bookings, visit the portfolio site.</p>
+    <div class="contact-links">
+      <a class="contact-link" href="mailto:drawingconclusionsrfi@gmail.com">
+        <div class="cl-icon">@</div>
+        <div><p class="cl-label">Email</p><p class="cl-text-val">drawingconclusionsrfi@gmail.com</p></div>
+      </a>
+      <a class="contact-link" href="https://instagram.com/drawingconclusions2020" target="_blank">
+        <div class="cl-icon">IG</div>
+        <div><p class="cl-label">Instagram</p><p class="cl-text-val">@drawingconclusions2020</p></div>
+      </a>
+      <a class="contact-link" href="https://cash.app/$DCRProdpay" target="_blank">
+        <div class="cl-icon">$</div>
+        <div><p class="cl-label">CashApp</p><p class="cl-text-val">$DCRProdpay</p></div>
+      </a>
+      <a class="contact-link" href="https://drawingconclusionsrfi-cyber.github.io/drawing-conclusions/portfolio.html">
+        <div class="cl-icon" style="background:var(--ink-dark)">DC</div>
+        <div><p class="cl-label">Portfolio & Store</p><p class="cl-text-val">Visit drawingconclusions.com/portfolio</p></div>
+      </a>
+    </div>
+  </div>
+  <div class="contact-form-card fade">
+    <form action="https://formspree.io/f/xdayjjdp" method="POST">
+      <label class="cf-label">Your Name</label>
+      <input class="cf-input" type="text" name="name" placeholder="Full name" required>
+      <label class="cf-label">Email Address</label>
+      <input class="cf-input" type="email" name="email" placeholder="your@email.com" required>
+      <label class="cf-label">Subject</label>
+      <input class="cf-input" type="text" name="subject" placeholder="Collaboration / General Inquiry / etc.">
+      <label class="cf-label">Message</label>
+      <textarea class="cf-textarea" name="message" placeholder="Tell me what's on your mind..." required></textarea>
+      <button class="cf-submit" type="submit">Send Message →</button>
+    </form>
+    <div id="cfSuccess" style="display:none;text-align:center;padding:2rem;color:var(--neon)">
+      <p style="font-size:1.5rem;margin-bottom:0.75rem">✓</p>
+      <p style="font-size:0.78rem;line-height:1.8">Message sent! I'll be in touch soon.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="personal-footer">
+  <p class="fp-copy">© 2025 Drawing Conclusions LLC</p>
+  <a class="fp-brand" href="https://drawingconclusionsrfi-cyber.github.io/drawing-conclusions">Drawing Conclusions</a>
+  <div class="fp-links">
+    <a href="https://instagram.com/drawingconclusions2020" target="_blank">Instagram</a>
+    <a href="https://tiktok.com/@drawingconclusions2020" target="_blank">TikTok</a>
+    <a href="https://drawingconclusionsrfi-cyber.github.io/drawing-conclusions/portfolio.html">Portfolio</a>
+    <a href="#contact">Contact</a>
+  </div>
+</footer>
+
+<script>
+// CURSOR
+const cur=document.getElementById('cur');
+const trail=document.getElementById('curTrail');
+let mx=0,my=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=(mx-5)+'px';cur.style.top=(my-5)+'px'});
+(function animTrail(){tx+=(mx-tx)*0.1;ty+=(my-ty)*0.1;trail.style.left=(tx-14)+'px';trail.style.top=(ty-14)+'px';requestAnimationFrame(animTrail)})();
+document.querySelectorAll('a,button,.feat-card,.value-item,.contact-link,.step').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.transform='scale(2.5)';cur.style.background='var(--neon)'});
+  el.addEventListener('mouseleave',()=>{cur.style.transform='scale(1)';cur.style.background='var(--rust)'});
+});
+
+// SCROLL FADE
+const obs=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting){en.target.classList.add('visible');obs.unobserve(en.target)}})},{threshold:0.12});
+document.querySelectorAll('.fade').forEach(el=>obs.observe(el));
+
+// COUNTERS
+function animCount(el,target){
+  let start=0;
+  const step=()=>{start+=Math.ceil(target/60);el.textContent=Math.min(start,target);if(start<target)requestAnimationFrame(step)};
+  requestAnimationFrame(step);
+}
+const cObs=new IntersectionObserver(entries=>{
+  if(entries[0].isIntersecting){
+    animCount(document.getElementById('cnt1'),7);
+    animCount(document.getElementById('cnt2'),150);
+    animCount(document.getElementById('cnt3'),48);
+    cObs.disconnect();
+  }
+},{threshold:0.5});
+const counter=document.getElementById('heroCounter');
+if(counter) cObs.observe(counter);
+
+// Portrait loaded from GitHub directly
+
+// CONTACT FORM
+// Form handled by Formspree
+
+// HAMBURGER MENU
+function toggleMenu(){
+  const btn = document.getElementById('hamburger');
+  const nav = document.getElementById('mobileNav');
+  const overlay = document.getElementById('menuOverlay');
+  btn.classList.toggle('open');
+  nav.classList.toggle('open');
+  overlay.classList.toggle('open');
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Drawing Conclusions LLC — Digital Flyer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#1e1e1e;
+  --cream:#f5f0e8;
+  --terracotta:#c4542a;
+  --ochre:#d4920a;
+  --electric:#7c3aed;
+  --neon:#00ff88;
+  --hot:#ff2d78;
+  --cyber:#00e5ff;
+  --card-bg:#1e130a;
+  --warm-dark:#1a0f05;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);
+  color:var(--cream);
+  font-family:'Space Mono',monospace;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* CURSOR */
+
+
+
+/* GRAIN */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:0.5}
+
+/* BG GRID */
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(196,84,42,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(196,84,42,0.04) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;z-index:0}
+.orb1{position:fixed;width:600px;height:600px;background:radial-gradient(circle,rgba(124,58,237,0.15) 0%,transparent 70%);top:-200px;right:-200px;border-radius:50%;pointer-events:none;z-index:0}
+.orb2{position:fixed;width:500px;height:500px;background:radial-gradient(circle,rgba(196,84,42,0.12) 0%,transparent 70%);bottom:-100px;left:-100px;border-radius:50%;pointer-events:none;z-index:0}
+
+/* ══ HEADER ══ */
+header{
+  position:relative;z-index:1;
+  padding:3rem 2rem 2rem;
+  text-align:center;
+  border-bottom:1px solid rgba(196,84,42,0.2);
+}
+.header-top{
+  display:flex;align-items:center;
+  justify-content:center;gap:1.5rem;
+  flex-wrap:wrap;margin-bottom:1.5rem;
+}
+.logo-video-wrap{
+  position:relative;
+  width:100px;height:100px;flex-shrink:0;
+}
+.logo-video-wrap video{
+  width:100%;height:100%;object-fit:contain;border-radius:4px;display:block;
+}
+.logo-glow{
+  position:absolute;inset:-15px;
+  background:radial-gradient(circle,rgba(196,84,42,0.3) 0%,transparent 70%);
+  border-radius:50%;
+  animation:glowPulse 3s ease-in-out infinite;
+  pointer-events:none;z-index:-1;
+}
+.logo-ring{
+  position:absolute;inset:-4px;
+  border:1px solid rgba(0,255,136,0.2);
+  border-radius:5px;
+  animation:ringPulse 3s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes glowPulse{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.12);opacity:1}}
+@keyframes ringPulse{0%,100%{opacity:0.2;box-shadow:0 0 0px rgba(0,255,136,0)}50%{opacity:0.6;box-shadow:0 0 15px rgba(0,255,136,0.2)}}
+
+.brand-text{text-align:left}
+.brand-label{font-size:0.58rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--neon);opacity:0.7;margin-bottom:0.4rem}
+.brand-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,6vw,4.5rem);line-height:0.95;letter-spacing:0.05em}
+.brand-name .tc{color:var(--terracotta)}
+.brand-name .dim{color:transparent;-webkit-text-stroke:1px var(--ochre);font-size:0.55em;letter-spacing:0.2em;display:block}
+.header-tagline{
+  font-family:'Barlow Condensed',sans-serif;
+  font-weight:300;font-size:1rem;
+  letter-spacing:0.3em;text-transform:uppercase;
+  color:rgba(245,240,232,0.35);
+  margin-bottom:1.5rem;
+}
+
+/* ACCENT LINE */
+.accent-line{
+  width:100%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--terracotta),var(--ochre),var(--hot),var(--cyber),var(--neon),transparent);
+  margin-bottom:0;
+}
+
+/* ══ MARQUEE ══ */
+.marquee-strip{
+  background:rgba(196,84,42,0.08);
+  overflow:hidden;padding:0.85rem 0;
+  border-bottom:1px solid rgba(196,84,42,0.15);
+  position:relative;z-index:1;
+}
+.marquee-inner{
+  display:flex;gap:2.5rem;
+  animation:marquee 18s linear infinite;
+  white-space:nowrap;width:max-content;
+}
+.marquee-inner:hover{animation-play-state:paused}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.m-item{font-family:'Barlow Condensed',sans-serif;font-weight:400;font-size:0.9rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(245,240,232,0.35)}
+.m-dot{color:var(--terracotta);font-size:1.2rem;line-height:1;vertical-align:middle}
+
+/* ══ SECTIONS ══ */
+.flyer-section{position:relative;z-index:1;padding:3rem 2rem;max-width:900px;margin:0 auto}
+.s-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--terracotta);margin-bottom:0.5rem}
+.s-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,3.5rem);letter-spacing:0.05em;line-height:1;margin-bottom:1.5rem}
+
+/* DIVIDER */
+.flyer-divider{width:100%;height:1px;background:rgba(196,84,42,0.15);margin:0}
+
+/* ══ SERVICES ══ */
+.services-row{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+@media(max-width:600px){.services-row{grid-template-columns:1fr}}
+.service-pill{
+  background:var(--card-bg);
+  border:1px solid rgba(196,84,42,0.2);
+  border-radius:4px;padding:1.5rem;
+  position:relative;overflow:hidden;
+  transition:border-color 0.2s,transform 0.2s;
+}
+.service-pill:hover{border-color:var(--terracotta);transform:translateY(-3px)}
+.service-pill::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.service-pill.design::before{background:linear-gradient(90deg,var(--terracotta),var(--ochre))}
+.service-pill.commission::before{background:linear-gradient(90deg,var(--electric),var(--hot))}
+.service-pill.merch::before{background:linear-gradient(90deg,var(--cyber),var(--neon))}
+.service-pill.graphic::before{background:linear-gradient(90deg,var(--hot),var(--electric))}
+.sp-icon{font-size:1.5rem;margin-bottom:0.75rem}
+.sp-name{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.08em;margin-bottom:0.4rem}
+.sp-desc{font-size:0.68rem;color:rgba(245,240,232,0.45);line-height:1.8;margin-bottom:0.75rem}
+.sp-price{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.1rem;color:var(--ochre);letter-spacing:0.08em}
+
+/* ══ MERCH GALLERY CAROUSEL ══ */
+.gallery-carousel{position:relative;overflow:hidden;border-radius:4px;margin-top:1rem}
+.gallery-track{
+  display:flex;gap:1rem;
+  animation:autoScroll 20s linear infinite;
+  width:max-content;
+}
+.gallery-track:hover{animation-play-state:paused}
+@keyframes autoScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.gallery-card{
+  flex:0 0 200px;height:200px;
+  background:var(--card-bg);
+  border:1px solid rgba(196,84,42,0.2);
+  border-radius:4px;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:0.5rem;
+  transition:border-color 0.2s;
+  position:relative;overflow:hidden;
+  flex-shrink:0;
+}
+.gallery-card:hover{border-color:var(--terracotta)}
+.gallery-card .g-emoji{font-size:3rem}
+.gallery-card .g-name{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.08em;color:var(--cream)}
+.gallery-card .g-price{font-size:0.65rem;color:var(--ochre);font-family:'Space Mono',monospace}
+.gallery-card .g-tag{
+  position:absolute;top:0.5rem;right:0.5rem;
+  background:var(--hot);color:white;
+  font-size:0.55rem;padding:0.15rem 0.4rem;
+  border-radius:2px;font-family:'Space Mono',monospace;
+  letter-spacing:0.08em;
+}
+.gallery-card .g-gradient{
+  position:absolute;inset:0;opacity:0.08;
+  background:linear-gradient(135deg,var(--terracotta),var(--electric));
+  pointer-events:none;
+}
+.gallery-fade-left{position:absolute;top:0;left:0;bottom:0;width:60px;background:linear-gradient(to right,var(--ink),transparent);pointer-events:none;z-index:2}
+.gallery-fade-right{position:absolute;top:0;right:0;bottom:0;width:60px;background:linear-gradient(to left,var(--ink),transparent);pointer-events:none;z-index:2}
+
+/* ══ CONTACT ══ */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+@media(max-width:600px){.contact-grid{grid-template-columns:1fr}}
+.contact-pill{
+  display:flex;align-items:center;gap:1rem;
+  background:var(--card-bg);
+  border:1px solid rgba(196,84,42,0.2);
+  border-radius:4px;padding:1.25rem;
+  text-decoration:none;color:var(--cream);
+  transition:all 0.2s;
+}
+.contact-pill:hover{border-color:var(--terracotta);transform:translateY(-2px)}
+.cp-icon{
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.9rem;flex-shrink:0;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;
+}
+.cp-label{font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.35);margin-bottom:0.2rem}
+.cp-val{font-size:0.75rem;line-height:1.4}
+
+/* ══ CTA BANNER ══ */
+.cta-banner{
+  position:relative;z-index:1;
+  background:var(--terracotta);
+  padding:2.5rem 2rem;
+  text-align:center;
+  overflow:hidden;
+}
+.cta-banner::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(245,240,232,0.03) 0px,rgba(245,240,232,0.03) 1px,transparent 1px,transparent 12px);background-size:18px 18px}
+.cta-banner-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,3.5rem);letter-spacing:0.08em;color:var(--cream);margin-bottom:0.5rem;position:relative;z-index:1}
+.cta-banner-sub{font-family:'Space Mono',monospace;font-size:0.72rem;color:rgba(245,240,232,0.7);margin-bottom:1.75rem;position:relative;z-index:1;line-height:1.8}
+.cta-buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+.cta-btn{
+  background:var(--ink);color:var(--cream);
+  padding:0.85rem 2rem;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.1rem;letter-spacing:0.15em;
+  text-decoration:none;border-radius:2px;
+  transition:all 0.2s;display:inline-block;
+}
+.cta-btn:hover{background:var(--warm-dark);transform:translateY(-2px)}
+.cta-btn.light{background:var(--cream);color:var(--terracotta)}
+.cta-btn.light:hover{background:var(--neon);color:var(--ink)}
+
+/* ══ FOOTER ══ */
+footer.flyer-footer{
+  position:relative;z-index:1;
+  background:var(--warm-dark);
+  border-top:1px solid rgba(196,84,42,0.2);
+  padding:1.5rem 2rem;
+  display:flex;justify-content:space-between;
+  align-items:center;flex-wrap:wrap;gap:1rem;
+  text-align:center;
+}
+.ff-copy{font-size:0.6rem;letter-spacing:0.12em;color:rgba(245,240,232,0.2)}
+.ff-brand{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--terracotta);letter-spacing:0.1em}
+.ff-links{display:flex;gap:1.5rem}
+.ff-links a{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,240,232,0.3);text-decoration:none;transition:color 0.2s}
+.ff-links a:hover{color:var(--neon)}
+
+/* FADE IN */
+.fade-up{opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+/* MOBILE */
+@media(max-width:600px){
+  .cursor,
+  .header-top{flex-direction:column;align-items:center;text-align:center}
+  .brand-text{text-align:center}
+  .flyer-section{padding:2.5rem 1.25rem}
+  .cta-buttons{flex-direction:column;align-items:center}
+  .cta-btn{width:100%;text-align:center}
+  footer.flyer-footer{flex-direction:column;align-items:center}
+  .ff-links{justify-content:center}
+}
+
+*{cursor:none!important}
+#dc-cursor{position:fixed;pointer-events:none;z-index:9999;width:24px;height:24px;transform:translate(-50%,-50%)}
+#dc-cursor::before{content:'';position:absolute;width:1px;height:24px;left:50%;top:0;transform:translateX(-50%);background:var(--terracotta,#c4542a)}
+#dc-cursor::after{content:'';position:absolute;width:24px;height:1px;top:50%;left:0;transform:translateY(-50%);background:var(--terracotta,#c4542a)}
+#dc-diamond{position:fixed;pointer-events:none;z-index:9998;width:10px;height:10px;background:var(--terracotta,#c4542a);transform:translate(-50%,-50%) rotate(45deg);transition:width .15s,height .15s;opacity:.85}
+
+</style>
+</head>
+<body>
+<div id="dc-cursor"></div><div id="dc-diamond"></div>
+
+
+
+<div class="bg-grid"></div>
+<div class="orb1"></div>
+<div class="orb2"></div>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="header-top">
+    <div class="logo-video-wrap">
+      <div class="logo-glow"></div>
+      <div class="logo-ring"></div>
+      <video src="seedance-logo.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:contain;border-radius:4px"></video>
+    </div>
+    <div class="brand-text">
+      <p class="brand-label">✦ Art Studio &amp; Creative Services</p>
+      <h1 class="brand-name">
+        <span class="tc">Drawing</span> Conclusions
+        <span class="dim">LLC</span>
+      </h1>
+    </div>
+  </div>
+  <p class="header-tagline">Bold Art · Fearless Creativity · Original Work That Speaks Before You Do</p>
+  <div class="accent-line"></div>
+</header>
+
+<!-- ══ MARQUEE ══ -->
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <span class="m-item">Art Commissions</span><span class="m-dot"> · </span>
+    <span class="m-item">Graphic Design</span><span class="m-dot"> · </span>
+    <span class="m-item">Custom Merch</span><span class="m-dot"> · </span>
+    <span class="m-item">Original Artwork</span><span class="m-dot"> · </span>
+    <span class="m-item">Drawing Conclusions LLC</span><span class="m-dot"> · </span>
+    <span class="m-item">Book Today</span><span class="m-dot"> · </span>
+    <span class="m-item">Art Commissions</span><span class="m-dot"> · </span>
+    <span class="m-item">Graphic Design</span><span class="m-dot"> · </span>
+    <span class="m-item">Custom Merch</span><span class="m-dot"> · </span>
+    <span class="m-item">Original Artwork</span><span class="m-dot"> · </span>
+    <span class="m-item">Drawing Conclusions LLC</span><span class="m-dot"> · </span>
+    <span class="m-item">Book Today</span><span class="m-dot"> · </span>
+  </div>
+</div>
+
+<!-- ══ SERVICES ══ -->
+<div class="flyer-section fade-up">
+  <p class="s-label">✦ What We Do</p>
+  <h2 class="s-title">Our <span style="color:var(--terracotta)">Services</span></h2>
+  <div class="services-row">
+    <div class="service-pill design">
+      <div class="sp-icon">◈</div>
+      <p class="sp-name">Graphic Design</p>
+      <p class="sp-desc">Logos, brand identity, flyers, social graphics, and merchandise layout. Professional designs delivered fast.</p>
+      <p class="sp-price">Starting at $75</p>
+    </div>
+    <div class="service-pill commission">
+      <div class="sp-icon">◉</div>
+      <p class="sp-name">Art Commissions</p>
+      <p class="sp-desc">Custom original artwork — portraits, abstract pieces, character art, and digital illustrations. Fully personalized.</p>
+      <p class="sp-price">Starting at $120</p>
+    </div>
+    <div class="service-pill merch">
+      <div class="sp-icon">◎</div>
+      <p class="sp-name">Custom Merch</p>
+      <p class="sp-desc">T-shirts, hats, mugs, and art prints featuring original Drawing Conclusions designs. Limited drops available.</p>
+      <p class="sp-price">From $22</p>
+    </div>
+    <div class="service-pill graphic">
+      <div class="sp-icon">◐</div>
+      <p class="sp-name">Original Artwork</p>
+      <p class="sp-desc">One of a kind original pieces — collections, series, and standalone works available for purchase.</p>
+      <p class="sp-price">Inquire for Pricing</p>
+    </div>
+  </div>
+</div>
+
+<div class="flyer-divider"></div>
+
+<!-- ══ MERCH GALLERY ══ -->
+<div class="flyer-section fade-up">
+  <p class="s-label">✦ The Store</p>
+  <h2 class="s-title">Merch <span style="color:var(--electric)">&amp; Drops</span></h2>
+  <p style="font-size:0.72rem;color:rgba(245,240,232,0.4);line-height:1.9;margin-bottom:1.5rem">Hover to pause · Pay via CashApp $DCRProdpay or Square</p>
+  <div class="gallery-carousel">
+    <div class="gallery-fade-left"></div>
+    <div class="gallery-fade-right"></div>
+    <div class="gallery-track" id="galleryTrack"></div>
+  </div>
+</div>
+
+<div class="flyer-divider"></div>
+
+<!-- ══ CONTACT ══ -->
+<div class="flyer-section fade-up">
+  <p class="s-label">✦ Get In Touch</p>
+  <h2 class="s-title">Contact <span style="color:var(--neon)">Us</span></h2>
+  <div class="contact-grid">
+    <a class="contact-pill" href="tel:8572561659">
+      <div class="cp-icon" style="background:var(--terracotta)">☎</div>
+      <div>
+        <p class="cp-label">Phone</p>
+        <p class="cp-val">(857) 256-1659</p>
+      </div>
+    </a>
+    <a class="contact-pill" href="mailto:drawingconclusionsrfi@gmail.com">
+      <div class="cp-icon" style="background:var(--electric)">@</div>
+      <div>
+        <p class="cp-label">Email</p>
+        <p class="cp-val">drawingconclusionsrfi@gmail.com</p>
+      </div>
+    </a>
+    <a class="contact-pill" href="https://cash.app/$DCRProdpay" target="_blank">
+      <div class="cp-icon" style="background:var(--neon);color:var(--ink)">$</div>
+      <div>
+        <p class="cp-label">CashApp</p>
+        <p class="cp-val">$DCRProdpay</p>
+      </div>
+    </a>
+    <a class="contact-pill" href="https://instagram.com/drawingconclusions2020" target="_blank">
+      <div class="cp-icon" style="background:var(--hot)">IG</div>
+      <div>
+        <p class="cp-label">Instagram</p>
+        <p class="cp-val">@drawingconclusions2020</p>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- ══ CTA BANNER ══ -->
+<div class="cta-banner fade-up">
+  <h2 class="cta-banner-title">Ready to Create Something?</h2>
+  <p class="cta-banner-sub">Book a consultation · Commission original art · Shop the store<br>Drawing Conclusions LLC — We Make It Real.</p>
+  <div class="cta-buttons">
+    <a class="cta-btn light" href="https://drawingconclusionsrfi-cyber.github.io/drawing-conclusions/portfolio.html">Visit Portfolio &amp; Store</a>
+    <a class="cta-btn" href="https://drawingconclusionsrfi-cyber.github.io/drawing-conclusions/personal.html">Meet the Artist</a>
+    <a class="cta-btn" href="tel:8572561659">Call (857) 256-1659</a>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="flyer-footer">
+  <p class="ff-copy">© 2025 Drawing Conclusions LLC — All rights reserved.</p>
+  <span class="ff-brand">DC</span>
+  <div class="ff-links">
+    <a href="https://instagram.com/drawingconclusions2020" target="_blank">Instagram</a>
+    <a href="https://cash.app/$DCRProdpay" target="_blank">CashApp</a>
+    <a href="https://drawingconclusionsrfi-cyber.github.io/drawing-conclusions/portfolio.html">Portfolio</a>
+  </div>
+</footer>
+
+<script>
+// CURSOR
+const cursor=document.getElementById('cursor');
+const ring=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=(mx-5)+'px';cursor.style.top=(my-5)+'px'});
+(function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=(rx-16)+'px';ring.style.top=(ry-16)+'px';requestAnimationFrame(animRing)})();
+document.querySelectorAll('a,.service-pill,.contact-pill,.cta-btn').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cursor.style.transform='scale(2)';ring.style.borderColor='var(--neon)'});
+  el.addEventListener('mouseleave',()=>{cursor.style.transform='scale(1)';ring.style.borderColor='var(--terracotta)'});
+});
+
+// SCROLL FADE
+const obs=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting){en.target.classList.add('visible');obs.unobserve(en.target)}})},{threshold:0.12});
+document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+
+// MERCH GALLERY
+const items = [
+  {emoji:'👕',name:'Void Tee',price:'$38',tag:'New',grad:'rgba(124,58,237,0.15)'},
+  {emoji:'🧢',name:'DC Logo Cap',price:'$32',tag:null,grad:'rgba(196,84,42,0.15)'},
+  {emoji:'☕',name:'Studio Mug',price:'$22',tag:'Best',grad:'rgba(0,229,255,0.1)'},
+  {emoji:'👕',name:'Burn Season Tee',price:'$45',tag:null,grad:'rgba(255,45,120,0.12)'},
+  {emoji:'🖼️',name:'Phantom Print',price:'$60',tag:'Ltd',grad:'rgba(212,146,10,0.15)'},
+  {emoji:'🧢',name:'Neon Cap',price:'$35',tag:null,grad:'rgba(0,255,136,0.08)'},
+  {emoji:'☕',name:'Ancestor Mug',price:'$24',tag:null,grad:'rgba(124,58,237,0.12)'},
+  {emoji:'🖼️',name:'Root Work Print',price:'$75',tag:'Ltd',grad:'rgba(196,84,42,0.12)'},
+];
+
+// Duplicate for seamless loop
+const allItems = [...items,...items];
+const track = document.getElementById('galleryTrack');
+track.innerHTML = allItems.map(m=>`
+  <div class="gallery-card" style="background:${m.grad}">
+    <div class="g-gradient"></div>
+    ${m.tag?`<span class="g-tag">${m.tag}</span>`:''}
+    <span class="g-emoji">${m.emoji}</span>
+    <span class="g-name">${m.name}</span>
+    <span class="g-price">${m.price}</span>
+  </div>`).join('');
+</script>
+<script>(function(){var c=document.getElementById('dc-cursor'),d=document.getElementById('dc-diamond');if(!c||!d)return;document.addEventListener('mousemove',function(e){c.style.left=e.clientX+'px';c.style.top=e.clientY+'px';d.style.left=e.clientX+'px';d.style.top=e.clientY+'px';});document.querySelectorAll('a,button').forEach(function(el){el.addEventListener('mouseenter',function(){d.style.width='16px';d.style.height='16px';d.style.opacity='1';});el.addEventListener('mouseleave',function(){d.style.width='10px';d.style.height='10px';d.style.opacity='.85';});});})()</script>
+</body>
+</html>
