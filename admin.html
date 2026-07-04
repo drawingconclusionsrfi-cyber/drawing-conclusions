@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Drawing Conclusions — Content Admin</title>
+<style>
+  :root{--ink:#1e1e1e;--panel:#262626;--card:#2e2e2e;--line:rgba(245,240,232,.14);--cream:#f5f0e8;--muted:rgba(245,240,232,.55);--terra:#c4542a;--ochre:#d4920a;--neon:#00d67a;--danger:#e0503a}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--ink);color:var(--cream);font-family:'Space Mono',ui-monospace,monospace;line-height:1.5;padding:0 0 6rem}
+  header{position:sticky;top:0;z-index:20;background:rgba(30,30,30,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+  header h1{font-size:1rem;letter-spacing:.06em;font-weight:700}
+  header .sp{flex:1}
+  .btn{background:var(--card);color:var(--cream);border:1px solid var(--line);padding:.6rem 1rem;border-radius:4px;font:inherit;font-size:.78rem;cursor:pointer;letter-spacing:.04em;transition:.15s;white-space:nowrap}
+  .btn:hover{border-color:var(--cream)}
+  .btn.primary{background:var(--terra);border-color:var(--terra)}
+  .btn.primary:hover{filter:brightness(1.1)}
+  .btn.neon{background:var(--neon);border-color:var(--neon);color:#04160e;font-weight:700}
+  .btn.ghost{background:transparent}
+  .btn.sm{padding:.35rem .6rem;font-size:.7rem}
+  .btn.danger{color:var(--danger);border-color:rgba(224,80,58,.4)}
+  .btn.danger:hover{background:rgba(224,80,58,.12)}
+  .wrap{max-width:920px;margin:0 auto;padding:1.5rem 1.25rem}
+  .tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
+  .tab{padding:.55rem 1rem;border:1px solid var(--line);border-radius:4px;cursor:pointer;font-size:.76rem;letter-spacing:.05em;color:var(--muted);background:var(--panel)}
+  .tab.active{color:var(--ink);background:var(--ochre);border-color:var(--ochre);font-weight:700}
+  .panel{display:none}
+  .panel.active{display:block;animation:fade .2s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .intro{font-size:.78rem;color:var(--muted);margin-bottom:1.25rem;line-height:1.7}
+  .intro b{color:var(--ochre)}
+  .item{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:1.1rem;margin-bottom:1rem}
+  .item-head{display:flex;align-items:center;gap:.75rem;margin-bottom:.9rem}
+  .item-head .thumb{width:54px;height:54px;border-radius:5px;background:var(--card);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem;overflow:hidden;border:1px solid var(--line)}
+  .item-head .thumb img{width:100%;height:100%;object-fit:cover}
+  .item-head .t{flex:1;min-width:0}
+  .item-head .t strong{display:block;font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .item-head .t span{font-size:.72rem;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+  .grid.three{grid-template-columns:1fr 1fr 1fr}
+  .full{grid-column:1/-1}
+  label{display:block;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}
+  input,select,textarea{width:100%;background:var(--ink);border:1px solid var(--line);border-radius:4px;color:var(--cream);font:inherit;font-size:.8rem;padding:.55rem .65rem}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ochre)}
+  textarea{resize:vertical;min-height:70px;line-height:1.6}
+  .row-actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:.9rem;flex-wrap:wrap}
+  .photo-row{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+  .photo-row .pv{width:60px;height:60px;border-radius:5px;background:var(--card);overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);flex-shrink:0}
+  .photo-row .pv img{width:100%;height:100%;object-fit:cover}
+  .hint{font-size:.68rem;color:var(--muted);margin-top:.3rem;line-height:1.5}
+  .sizes-wrap{border:1px dashed var(--line);border-radius:5px;padding:.75rem;margin-top:.4rem}
+  .size-row{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:.5rem;margin-bottom:.5rem;align-items:center}
+  .size-row:last-child{margin-bottom:0}
+  .addbar{margin:.5rem 0 2rem;display:flex;gap:.6rem;flex-wrap:wrap}
+  .save-status{font-size:.72rem;color:var(--neon);opacity:0;transition:.3s}
+  .save-status.show{opacity:1}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:50;padding:1.25rem}
+  .modal-bg.open{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:8px;max-width:640px;width:100%;max-height:85vh;overflow:auto;padding:1.5rem}
+  .modal h3{font-size:.95rem;margin-bottom:.4rem}
+  .modal p{font-size:.76rem;color:var(--muted);line-height:1.7;margin-bottom:1rem}
+  .modal textarea{min-height:220px;font-size:.72rem;white-space:pre;overflow-wrap:normal;overflow-x:auto}
+  .steps{font-size:.76rem;color:var(--muted);line-height:1.9;margin:.5rem 0 1rem;padding-left:1.1rem}
+  .steps b{color:var(--cream)}
+  code{background:var(--ink);padding:.1rem .35rem;border-radius:3px;color:var(--ochre);font-size:.72rem}
+  .warn{background:rgba(212,146,10,.1);border:1px solid rgba(212,146,10,.3);border-radius:5px;padding:.75rem;font-size:.74rem;color:var(--cream);line-height:1.6;margin-bottom:1.25rem}
+  @media(max-width:560px){.grid,.grid.three{grid-template-columns:1fr}.size-row{grid-template-columns:1fr 1fr 1fr auto}}
+</style>
+</head>
+<body>
+<header>
+  <h1>&#9670; DC Content Admin</h1>
+  <span class="save-status" id="saveStatus">Saved &#10003;</span>
+  <span class="sp"></span>
+  <button class="btn ghost sm" id="loadLiveBtn" title="Load the current data.js you have deployed">Import data.js</button>
+  <button class="btn ghost sm danger" id="resetBtn">Reset</button>
+  <button class="btn neon" id="exportBtn">&#8681; Export data.js</button>
+</header>
+
+<div class="wrap">
+  <div class="warn">
+    <b>How this works:</b> Edit your products &amp; reviews below &rarr; click <b>Export data.js</b> &rarr; upload the downloaded <code>data.js</code> to your GitHub repo (replace the old one). Your site updates. You never touch the big HTML file. Changes here auto-save in this browser, so you can come back anytime.
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="merch">Merch</div>
+    <div class="tab" data-tab="prints">Prints</div>
+    <div class="tab" data-tab="testimonials">Reviews</div>
+    <div class="tab" data-tab="help">Help</div>
+  </div>
+
+  <!-- MERCH -->
+  <div class="panel active" id="panel-merch">
+    <p class="intro">Your store products (tees, hats, mugs, prints). Add a <b>photo</b> to replace the emoji placeholder &mdash; that's the single biggest thing for sales. Price like <b>$38</b>.</p>
+    <div id="merchList"></div>
+    <div class="addbar"><button class="btn primary" onclick="addMerch()">+ Add Product</button></div>
+  </div>
+
+  <!-- PRINTS -->
+  <div class="panel" id="panel-prints">
+    <p class="intro">Fine-art prints sold with multiple sizes. Each size has its own <b>price</b> and <b>shipping</b>. The site adds MA tax (6.25%) automatically at checkout.</p>
+    <div id="printsList"></div>
+    <div class="addbar"><button class="btn primary" onclick="addPrint()">+ Add Print</button></div>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <div class="panel" id="panel-testimonials">
+    <p class="intro">Real client reviews build trust. Add them as they come in. Initials for the avatar are generated automatically from the name.</p>
+    <div id="testList"></div>
+    <div class="addbar"><button class="btn primary" onclick="addTest()">+ Add Review</button></div>
+  </div>
+
+  <!-- HELP -->
+  <div class="panel" id="panel-help">
+    <p class="intro">Everything you need to run the site content.</p>
+    <div class="item">
+      <strong style="display:block;margin-bottom:.6rem">Publishing changes (every time)</strong>
+      <ol class="steps">
+        <li>Make your edits in the tabs above.</li>
+        <li>Click <b>Export data.js</b> (top right) &mdash; a file downloads.</li>
+        <li>Go to your GitHub repo &rarr; open <code>data.js</code> &rarr; upload/replace with the new one &rarr; commit.</li>
+        <li>Wait ~1 min, then hard-refresh your site (<b>Ctrl/Cmd+Shift+R</b>).</li>
+      </ol>
+    </div>
+    <div class="item">
+      <strong style="display:block;margin-bottom:.6rem">Adding product photos</strong>
+      <p class="intro" style="margin:0">Click <b>Choose Photo</b> on any product. The image is embedded directly into <code>data.js</code>, so you don't need to upload photos separately. Keep photos reasonably sized (under ~1MB each) so the file stays light &mdash; the tool warns you if one is large.</p>
+    </div>
+    <div class="item">
+      <strong style="display:block;margin-bottom:.6rem">Safety net</strong>
+      <p class="intro" style="margin:0">If <code>data.js</code> is ever missing or broken, your site automatically falls back to its built-in defaults &mdash; it will never go blank. This admin also keeps a copy of your work in this browser.</p>
+    </div>
+    <div class="item">
+      <strong style="display:block;margin-bottom:.6rem">Important</strong>
+      <p class="intro" style="margin:0">Keep <code>admin.html</code> private &mdash; don't link to it from your site menu. It's your control panel. (It also tells search engines not to index it.)</p>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORT MODAL -->
+<div class="modal-bg" id="exportModal">
+  <div class="modal">
+    <h3>&#8681; Your data.js is ready</h3>
+    <p>It downloaded automatically. If not, copy the text below into a file named <code>data.js</code>. Then upload it to your GitHub repo, replacing the old one.</p>
+    <textarea id="exportText" spellcheck="false" readonly></textarea>
+    <div class="row-actions">
+      <button class="btn ghost" onclick="closeExport()">Close</button>
+      <button class="btn" id="copyBtn">Copy to clipboard</button>
+      <button class="btn primary" id="dlBtn">Download again</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ Defaults (mirror the site's built-in data) ============ */
+var DEFAULTS = {
+  merch: [
+    {emoji:'\u{1F455}', img:'', title:'Void Tee',           price:'$38', category:'tshirt', badge:'New'},
+    {emoji:'\u{1F9E2}', img:'', title:'DC Logo Cap',        price:'$32', category:'hat',    badge:''},
+    {emoji:'\u2615',    img:'', title:'Studio Mug',         price:'$22', category:'mug',    badge:'Bestseller'},
+    {emoji:'\u{1F455}', img:'', title:'Burn Season Tee',    price:'$45', category:'tshirt', badge:''},
+    {emoji:'\u{1F5BC}', img:'', title:'Phantom Print',      price:'$60', category:'print',  badge:'Ltd Ed'},
+    {emoji:'\u{1F9E2}', img:'', title:'Neon Ancestors Cap', price:'$35', category:'hat',    badge:''},
+    {emoji:'\u2615',    img:'', title:'Ancestor Mug',       price:'$24', category:'mug',    badge:''},
+    {emoji:'\u{1F5BC}', img:'', title:'Root Work Print',    price:'$75', category:'print',  badge:'Ltd Ed'}
+  ],
+  prints: [
+    {id:'usk', title:'Universal Space Kiss', medium:'Gicl\u00e9e on Gallery-Wrapped Canvas', img:'universal-space-kiss.jpg',
+     desc:'A cosmic portrait \u2014 a figure meeting the sun across the void. Archival inks on gallery-wrapped canvas, ready to hang. Signed by the artist.',
+     sizes:[{label:'12" x 16"',price:65,ship:14},{label:'16" x 20"',price:95,ship:14},{label:'18" x 24"',price:125,ship:19},{label:'24" x 36"',price:175,ship:25}]},
+    {id:'c617', title:'Code 617', medium:'Gicl\u00e9e on Gallery-Wrapped Canvas', img:'code-617.jpg',
+     desc:'Bold, graphic, unmistakably Boston. Archival gicl\u00e9e on gallery-wrapped canvas, ready to hang. Signed by the artist.',
+     sizes:[{label:'12" x 16"',price:65,ship:14},{label:'16" x 20"',price:95,ship:14},{label:'18" x 24"',price:125,ship:19},{label:'24" x 36"',price:175,ship:25}]}
+  ],
+  testimonials: [
+    {text:'Renford is incredibly talented. The Yemon Entertainment logo was exactly what we envisioned \u2014 professional and on time.', name:'Yemon Entertainment', role:'Logo Design \u00b7 Client', stars:5},
+    {text:'The Cabal logo perfectly captured our brand. Drawing Conclusions LLC delivered beyond expectations.', name:'Cabal App', role:'Logo Design \u00b7 Client', stars:5},
+    {text:'Seamless experience. The creative vision brought our brand to life beautifully.', name:'Morris Code Entertainment', role:'Logo Design \u00b7 Client', stars:5}
+  ]
+};
+var CATEGORIES=['tshirt','hat','mug','print'];
+var LS_KEY='dc_admin_data_v1';
+var data;
+
+/* ============ Load / Save ============ */
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function load(){
+  try{var raw=localStorage.getItem(LS_KEY);if(raw){data=JSON.parse(raw);normalize();return;}}catch(e){}
+  data=clone(DEFAULTS);
+}
+function normalize(){
+  data.merch=data.merch||[];data.prints=data.prints||[];data.testimonials=data.testimonials||[];
+}
+var saveT;
+function save(){
+  try{localStorage.setItem(LS_KEY,JSON.stringify(data));}catch(e){}
+  var s=document.getElementById('saveStatus');s.classList.add('show');
+  clearTimeout(saveT);saveT=setTimeout(function(){s.classList.remove('show');},1200);
+}
+
+/* ============ Tabs ============ */
+document.querySelectorAll('.tab').forEach(function(t){
+  t.onclick=function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
+    document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active');
+    document.getElementById('panel-'+t.dataset.tab).classList.add('active');
+  };
+});
+
+/* ============ Helpers ============ */
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function initialsOf(name){return (name||'').split(/\s+/).map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase()||'DC';}
+
+/* ============ MERCH ============ */
+function renderMerch(){
+  var el=document.getElementById('merchList');el.innerHTML='';
+  data.merch.forEach(function(m,i){
+    var d=document.createElement('div');d.className='item';
+    var thumb=m.img?'<img src="'+esc(m.img)+'">':esc(m.emoji||'\u{1F3A8}');
+    d.innerHTML=
+      '<div class="item-head"><div class="thumb">'+thumb+'</div>'+
+      '<div class="t"><strong>'+esc(m.title||'Untitled')+'</strong><span>'+esc(m.price||'')+(m.category?' \u00b7 '+esc(m.category):'')+'</span></div></div>'+
+      '<div class="grid">'+
+        '<div class="full"><label>Product name</label><input value="'+esc(m.title)+'" oninput="upd(\'merch\','+i+',\'title\',this.value)"></div>'+
+        '<div><label>Price (e.g. $38)</label><input value="'+esc(m.price)+'" oninput="upd(\'merch\','+i+',\'price\',this.value)"></div>'+
+        '<div><label>Category</label>'+catSelect(m.category,i)+'</div>'+
+        '<div><label>Badge (optional)</label><input value="'+esc(m.badge)+'" placeholder="New / Bestseller / Ltd Ed" oninput="upd(\'merch\','+i+',\'badge\',this.value)"></div>'+
+        '<div><label>Emoji fallback</label><input value="'+esc(m.emoji)+'" oninput="upd(\'merch\','+i+',\'emoji\',this.value)"></div>'+
+        '<div class="full"><label>Product photo</label><div class="photo-row"><div class="pv">'+(m.img?'<img src="'+esc(m.img)+'">':'\u2014')+'</div>'+
+          '<button class="btn sm" onclick="pickPhoto(\'merch\','+i+')">Choose Photo</button>'+
+          (m.img?'<button class="btn sm danger" onclick="upd(\'merch\','+i+',\'img\',\'\');refresh()">Remove photo</button>':'')+
+          '</div><div class="hint">A real photo replaces the emoji. Under ~1MB is ideal.</div></div>'+
+      '</div>'+
+      '<div class="row-actions">'+
+        '<button class="btn sm" onclick="move(\'merch\','+i+',-1)">&#8593; Up</button>'+
+        '<button class="btn sm" onclick="move(\'merch\','+i+',1)">&#8595; Down</button>'+
+        '<button class="btn sm danger" onclick="del(\'merch\','+i+')">Delete</button>'+
+      '</div>';
+    el.appendChild(d);
+  });
+}
+function catSelect(val,i){
+  var s='<select onchange="upd(\'merch\','+i+',\'category\',this.value)">';
+  CATEGORIES.forEach(function(c){s+='<option value="'+c+'"'+(c===val?' selected':'')+'>'+c+'</option>';});
+  s+='</select>';return s;
+}
+function addMerch(){data.merch.push({emoji:'\u{1F3A8}',img:'',title:'New Product',price:'$0',category:'tshirt',badge:''});save();renderMerch();}
+
+/* ============ PRINTS ============ */
+function renderPrints(){
+  var el=document.getElementById('printsList');el.innerHTML='';
+  data.prints.forEach(function(p,i){
+    var thumb=p.img?'<img src="'+esc(p.img)+'">':'\u{1F5BC}';
+    var sizesHtml='<div class="sizes-wrap"><label>Sizes &amp; pricing</label>';
+    (p.sizes||[]).forEach(function(s,si){
+      sizesHtml+='<div class="size-row">'+
+        '<input placeholder="Label (e.g. 16&quot; x 20&quot;)" value="'+esc(s.label)+'" oninput="updSize('+i+','+si+',\'label\',this.value)">'+
+        '<input type="number" placeholder="Price" value="'+esc(s.price)+'" oninput="updSize('+i+','+si+',\'price\',this.value)">'+
+        '<input type="number" placeholder="Ship" value="'+esc(s.ship)+'" oninput="updSize('+i+','+si+',\'ship\',this.value)">'+
+        '<button class="btn sm danger" onclick="delSize('+i+','+si+')">&times;</button>'+
+      '</div>';
+    });
+    sizesHtml+='<button class="btn sm" onclick="addSize('+i+')">+ Add size</button></div>';
+    var d=document.createElement('div');d.className='item';
+    d.innerHTML=
+      '<div class="item-head"><div class="thumb">'+thumb+'</div>'+
+      '<div class="t"><strong>'+esc(p.title||'Untitled')+'</strong><span>'+esc((p.sizes||[]).length+' sizes')+'</span></div></div>'+
+      '<div class="grid">'+
+        '<div><label>Title</label><input value="'+esc(p.title)+'" oninput="upd(\'prints\','+i+',\'title\',this.value)"></div>'+
+        '<div><label>ID (unique, no spaces)</label><input value="'+esc(p.id)+'" oninput="upd(\'prints\','+i+',\'id\',this.value)"></div>'+
+        '<div class="full"><label>Medium</label><input value="'+esc(p.medium)+'" oninput="upd(\'prints\','+i+',\'medium\',this.value)"></div>'+
+        '<div class="full"><label>Description</label><textarea oninput="upd(\'prints\','+i+',\'desc\',this.value)">'+esc(p.desc)+'</textarea></div>'+
+        '<div class="full"><label>Print photo</label><div class="photo-row"><div class="pv">'+(p.img?'<img src="'+esc(p.img)+'">':'\u2014')+'</div>'+
+          '<button class="btn sm" onclick="pickPhoto(\'prints\','+i+')">Choose Photo</button></div>'+
+          '<div class="hint">Filename (like <code>code-617.jpg</code>) or embedded photo both work.</div></div>'+
+        '<div class="full">'+sizesHtml+'</div>'+
+      '</div>'+
+      '<div class="row-actions">'+
+        '<button class="btn sm" onclick="move(\'prints\','+i+',-1)">&#8593; Up</button>'+
+        '<button class="btn sm" onclick="move(\'prints\','+i+',1)">&#8595; Down</button>'+
+        '<button class="btn sm danger" onclick="del(\'prints\','+i+')">Delete</button>'+
+      '</div>';
+    el.appendChild(d);
+  });
+}
+function addPrint(){data.prints.push({id:'print'+Date.now(),title:'New Print',medium:'Gicl\u00e9e Print',img:'',desc:'',sizes:[{label:'12" x 16"',price:65,ship:14}]});save();renderPrints();}
+function addSize(i){data.prints[i].sizes=data.prints[i].sizes||[];data.prints[i].sizes.push({label:'',price:0,ship:0});save();renderPrints();}
+function delSize(i,si){data.prints[i].sizes.splice(si,1);save();renderPrints();}
+function updSize(i,si,k,v){data.prints[i].sizes[si][k]=(k==='label')?v:(parseFloat(v)||0);save();}
+
+/* ============ TESTIMONIALS ============ */
+function renderTest(){
+  var el=document.getElementById('testList');el.innerHTML='';
+  data.testimonials.forEach(function(t,i){
+    var d=document.createElement('div');d.className='item';
+    d.innerHTML=
+      '<div class="item-head"><div class="thumb" style="font-size:.8rem;letter-spacing:.05em">'+esc(initialsOf(t.name))+'</div>'+
+      '<div class="t"><strong>'+esc(t.name||'Client')+'</strong><span>'+esc(t.role||'')+'</span></div></div>'+
+      '<div class="grid">'+
+        '<div class="full"><label>Quote</label><textarea oninput="upd(\'testimonials\','+i+',\'text\',this.value)">'+esc(t.text)+'</textarea></div>'+
+        '<div><label>Client name</label><input value="'+esc(t.name)+'" oninput="upd(\'testimonials\','+i+',\'name\',this.value)"></div>'+
+        '<div><label>Role / service</label><input value="'+esc(t.role)+'" oninput="upd(\'testimonials\','+i+',\'role\',this.value)"></div>'+
+        '<div><label>Stars (1-5)</label><input type="number" min="1" max="5" value="'+esc(t.stars||5)+'" oninput="upd(\'testimonials\','+i+',\'stars\',this.value)"></div>'+
+      '</div>'+
+      '<div class="row-actions">'+
+        '<button class="btn sm" onclick="move(\'testimonials\','+i+',-1)">&#8593; Up</button>'+
+        '<button class="btn sm" onclick="move(\'testimonials\','+i+',1)">&#8595; Down</button>'+
+        '<button class="btn sm danger" onclick="del(\'testimonials\','+i+')">Delete</button>'+
+      '</div>';
+    el.appendChild(d);
+  });
+}
+function addTest(){data.testimonials.push({text:'',name:'New Client',role:'Service \u00b7 Client',stars:5});save();renderTest();}
+
+/* ============ Generic ops ============ */
+function upd(coll,i,k,v){
+  if(k==='stars'){v=Math.max(1,Math.min(5,parseInt(v)||5));}
+  data[coll][i][k]=v;save();
+  if(k==='title'||k==='name'){ /* keep header live without full re-render churn */ refreshHead(coll); }
+}
+function refreshHead(coll){ if(coll==='merch')renderMerch();else if(coll==='prints')renderPrints();else renderTest(); }
+function refresh(){renderMerch();renderPrints();renderTest();}
+function del(coll,i){ if(confirm('Delete this item?')){data[coll].splice(i,1);save();refresh();} }
+function move(coll,i,dir){
+  var j=i+dir;if(j<0||j>=data[coll].length)return;
+  var a=data[coll];var tmp=a[i];a[i]=a[j];a[j]=tmp;save();refresh();
+}
+
+/* ============ Photo picker (embeds as base64) ============ */
+var pickCtx=null;
+function pickPhoto(coll,i){
+  pickCtx={coll:coll,i:i};
+  document.getElementById('fileInput').click();
+}
+document.addEventListener('DOMContentLoaded',function(){
+  var fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.id='fileInput';fi.style.display='none';
+  fi.onchange=function(){
+    var f=fi.files&&fi.files[0];if(!f||!pickCtx)return;
+    if(f.size>2*1024*1024 && !confirm('This image is '+(f.size/1048576).toFixed(1)+'MB. Large images make your site slower. Use it anyway? (Tip: resize to ~1000px wide first.)')){fi.value='';return;}
+    var r=new FileReader();
+    r.onload=function(){data[pickCtx.coll][pickCtx.i].img=r.result;save();refresh();};
+    r.readAsDataURL(f);
+    fi.value='';
+  };
+  document.body.appendChild(fi);
+});
+
+/* ============ Export ============ */
+function buildDataJS(){
+  var out='/* Drawing Conclusions LLC \u2014 site content data\n'+
+          '   Managed by admin.html. Edit there, export, and re-upload this file.\n'+
+          '   Safe to delete: the site falls back to built-in defaults if missing. */\n'+
+          'window.DC_DATA = '+JSON.stringify(data,null,2)+';\n';
+  return out;
+}
+function doDownload(text){
+  var blob=new Blob([text],{type:'text/javascript'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='data.js';
+  document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},100);
+}
+document.getElementById('exportBtn').onclick=function(){
+  var text=buildDataJS();
+  document.getElementById('exportText').value=text;
+  doDownload(text);
+  document.getElementById('exportModal').classList.add('open');
+};
+document.getElementById('dlBtn').onclick=function(){doDownload(document.getElementById('exportText').value);};
+document.getElementById('copyBtn').onclick=function(){
+  var ta=document.getElementById('exportText');ta.select();
+  try{document.execCommand('copy');this.textContent='Copied \u2713';var b=this;setTimeout(function(){b.textContent='Copy to clipboard';},1500);}catch(e){}
+};
+function closeExport(){document.getElementById('exportModal').classList.remove('open');}
+document.getElementById('exportModal').onclick=function(e){if(e.target===this)closeExport();};
+
+/* ============ Import existing data.js ============ */
+document.getElementById('loadLiveBtn').onclick=function(){
+  var inp=document.createElement('input');inp.type='file';inp.accept='.js,text/javascript';
+  inp.onchange=function(){
+    var f=inp.files&&inp.files[0];if(!f)return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{
+        var win={};var fn=new Function('window',r.result);fn(win);
+        if(win.DC_DATA){data=win.DC_DATA;normalize();save();refresh();alert('Imported successfully.');}
+        else alert('Could not find DC_DATA in that file.');
+      }catch(e){alert('Could not read that file: '+e.message);}
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+};
+
+/* ============ Reset ============ */
+document.getElementById('resetBtn').onclick=function(){
+  if(confirm('Reset everything back to the original built-in content? Your current edits in this browser will be lost.')){
+    data=clone(DEFAULTS);save();refresh();
+  }
+};
+
+/* ============ Init ============ */
+load();refresh();
+</script>
+</body>
+</html>
