@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Editor files are local-only and should never be indexed
+Disallow: /editor-standalone.html
+Disallow: /editor.html
+Disallow: /admin.html
+
+Sitemap: https://drawingconclusionsrfi-cyber.github.io/drawing-conclusions/sitemap.xml
